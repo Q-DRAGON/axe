@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>作业 0</title>
+        <style>
+            canvas {
+                outline: 1px dashed lightskyblue;
+            }
+        </style>
+        <!-- 引入所有用到的文件 -->
+        <script src='gua_utils.js'></script>
+        <script src='gua_object.js'></script>
+        <script src='gua_point.js'></script>
+        <script src='gua_size.js'></script>
+        <script src='gua_color.js'></script>
+        <script src='gua_canvas.js'></script>
+    </head>
+    <body>
+        <canvas id="id-canvas" width="400" height="300"></canvas>
+<script>
+// 函数名应该用 const 修饰, 这样不会被意外修改
+const __main = function() {
+    let canvas = GuaCanvas.new('#id-canvas')
+    // 这是一个测试函数, 给你看原理的, 只是看看
+    // canvas.__debug_draw_demo()
+    // 画一条线
+    let p1 = GuaPoint.new(0, 0)
+    let p2 = GuaPoint.new(255, 128)
+    let upperLeft = GuaPoint.new(0, 0)
+    let size = GuaSize.new(50, 40)
+    canvas.drawLine(p1, p2, GuaColor.black())
+    var fillColor = GuaColor.new(0, 255, 0, 255)
+    canvas.drawRect(upperLeft, size, fillColor, GuaColor.black())
+    // 渲染出来, 不调用这个函数就不会显示结果
+    canvas.render()
+}
+
+__main()
+</script>
+    </body>
+</html>
