@@ -60,31 +60,25 @@ class GuaCanvas extends GuaObject {
         // p1 p2 分别是起点和终点, GuaPoint 类型
         // color GuaColor
         // 使用 drawPoint 函数来画线
-        if (p1.x - p2.x == 0) {
-            if (p2.y > p1.y) {
-                for (var j = p1.y; j < p2.y; j++) {
-                    var point = GuaPoint.new(p1.x, j)
-                    this.drawPoint(point, color)
-                }
-            }else{
-                for (var j = p1.y; j > p2.y; j--) {
-                    var point = GuaPoint.new(p1.x, j)
-                    this.drawPoint(point, color)
-                }
+        let dx = p2.x - p1.x
+        let dy = p2.y - p1.y
+        if (Math.abs(dy) > Math.abs(dx)) {
+            let y = p1.y
+            while (y !== p2.y) {
+                let x = dx / dy * (y - p1.y) + p1.x
+                let point = GuaPoint.new(x, y)
+                this.drawPoint(point, color)
+                let i = dy > 0 ? 1 : -1
+                y += i
             }
-        }else {
-            if (p2.x > p1.x) {
-                for (let i = p1.x; i < p2.x; i++) {
-                    let j = (p2.y - p1.y) * (i - p1.x)/(p2.x - p1.x) + p1.y
-                    var point = GuaPoint.new(i , j)
-                    this.drawPoint(point, color)
-                }
-            }else{
-                for (let i = p1.x; i > p2.x; i--) {
-                    let j = (p2.y - p1.y) * (i - p1.x)/(p2.x - p1.x) + p1.y
-                    var point = GuaPoint.new(i , j)
-                    this.drawPoint(point, color)
-                }
+        }else{
+            let x = p1.x
+            while (x !== p2.x) {
+                let y = dx == 0 ? p1.y : dy / dx * (x - p1.x) + p1.y
+                let point = GuaPoint.new(x, y)
+                this.drawPoint(point, color)
+                let i = dx > 0 ? 1 : -1
+                x += i
             }
         }
     }
@@ -104,7 +98,7 @@ class GuaCanvas extends GuaObject {
         this.drawLine(p3, p4, borderColor)
         this.drawLine(p4, p1, borderColor)
         for (var j = y + 1; j < p3.y; j++) {
-            this.drawLine(GuaPoint.new(x + 1, j), GuaPoint.new(p2.x - 0.1, j),fillColor)
+            this.drawLine(GuaPoint.new(x + 1, j), GuaPoint.new(p2.x, j),fillColor)
         }
     }
     __debug_draw_demo() {
