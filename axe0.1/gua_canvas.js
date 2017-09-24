@@ -82,7 +82,7 @@ class GuaCanvas extends GuaObject {
             }
         }
     }
-    drawRect(upperLeft, size, fillColor, borderColor=GuaColor.black()) {
+    drawRect(upperLeft, size, fillColor=null, borderColor=GuaColor.black()) {
         // upperLeft: GuaPoint, 矩形左上角座标
         // size: GuaSize, 矩形尺寸
         // fillColor: GuaColor, 矩形的填充颜色, 默认为空, 表示不填充
