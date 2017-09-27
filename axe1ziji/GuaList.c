@@ -40,7 +40,6 @@ GuaListCreate(int *element, int numberOfElements) {
         GuaList *n = malloc(sizeof(GuaList));
         n->element = element[i];
         n->next = list->next;
-
         list->next = n;
     }
 
@@ -96,15 +95,34 @@ GuaListAppend(GuaList *list, type element) {
 
 void
 GuaListPrepend(GuaList *list, type element) {
-
+    GuaList *n = malloc(sizeof(GuaList));
+    n->element = element;
+    n->next = list->next;
+    list->next = n;
 }
 
 int
 GuaListIndexOfElement(GuaList *list, type element) {
-    return -1;
+    GuaList *l = list->next;
+    type count = -1;
+    type index = -1;
+    while(l != NULL) {
+        count = count + 1;
+        if (l->element == element) {
+            index = count;
+        }
+        l = l->next;
+    }
+    return index;
 }
 
 void
 GuaListInsertElementAtIndex(GuaList *list, type element, int index) {
-
+    for (int i = 0; i < index; i++) {
+        list = list->next;
+    }
+    GuaList *n = malloc(sizeof(GuaList));
+    n->element = element;
+    n->next = list->next;
+    list->next = n;
 }
