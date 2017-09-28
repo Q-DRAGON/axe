@@ -43,23 +43,38 @@ testGuaListContains(){
 
 void
 testGuaListAppend(){
-    type a1[] = {1, 2, 3};
+    type a1[] = {1, 2, 4};
     int n1 = 3;
     GuaList *l1 = GuaListCreate(a1, n1);
     GuaListAppend(l1, 3);
-    ensure(GuaListLength(l1) == 4, "test gua list append 1");
+    GuaListLog(l1);
+    type a11[] = {1, 2, 4, 3};
+    int n11 = 4;
+    GuaList *l11 = GuaListCreate(a11, n11);
+    GuaListLog(l11);
+    ensure(GuaListEquals(l1, l11) == true, "test gua list append 1");
 
     type a2[] = {};
     int n2 = 0;
     GuaList *l2 = GuaListCreate(a2, n2);
     GuaListAppend(l2, 1);
-    ensure(GuaListLength(l2) == 1, "test gua list append 2");
+    GuaListLog(l2);
+    type a22[] = {1};
+    int n22 = 1;
+    GuaList *l22 = GuaListCreate(a22, n22);
+    GuaListLog(l22);
+    ensure(GuaListEquals(l2, l22) == true, "test gua list append 2");
 
     type a3[] = {1, 1, 1};
     int n3 = 3;
     GuaList *l3 = GuaListCreate(a3, n3);
-    GuaListAppend(l3, 1);
-    ensure(GuaListLength(l3) == 4, "test gua list append 3");
+    GuaListAppend(l3, 4);
+    GuaListLog(l3);
+    type a33[] = {1, 1, 1, 4};
+    int n33 = 4;
+    GuaList *l33 = GuaListCreate(a33, n33);
+    GuaListLog(l33);
+    ensure(GuaListEquals(l3, l33) == true, "test gua list append 3");
 }
 
 void
@@ -68,19 +83,19 @@ testGuaListPrepend(){
     int n1 = 3;
     GuaList *l1 = GuaListCreate(a1, n1);
     GuaListPrepend(l1, 3);
-    ensure(GuaListLength(l1) == 4, "test gua list prepend 1");
+    ensure(GuaListIndexOfElement(l1, 3) == 0, "test gua list prepend 1");
 
     type a2[] = {};
     int n2 = 0;
     GuaList *l2 = GuaListCreate(a2, n2);
     GuaListPrepend(l2, 1);
-    ensure(GuaListLength(l2) == 1, "test gua list prepend 2");
+    ensure(GuaListIndexOfElement(l2, 1) == 0, "test gua list prepend 2");
 
     type a3[] = {1, 1, 1};
     int n3 = 3;
     GuaList *l3 = GuaListCreate(a3, n3);
     GuaListPrepend(l3, 1);
-    ensure(GuaListLength(l3) == 4, "test gua list prepend 3");
+    ensure(GuaListIndexOfElement(l3, 3) == 0, "test gua list prepend 3");
 }
 
 void
@@ -126,6 +141,7 @@ testGuaListInsertElementAtIndex(){
     GuaList *l3 = GuaListCreate(a3, n3);
     GuaListInsertElementAtIndex(l3, 6, 0);
     ensure( GuaListIndexOfElement(l3, 6) == 0, "Gua List Insert Element At Index 3");
+
 }
 
 int

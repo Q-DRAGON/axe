@@ -69,5 +69,11 @@ GuaListIndexOfElement(GuaList *list, type element);
 void
 GuaListInsertElementAtIndex(GuaList *list, type element, int index);
 
+// 通过下标取回值
+int
+GuaListElementOfIndex(GuaList *list, type index);
 
+// 判断两个链表是否相等
+bool
+GuaListEquals(GuaList *list1, GuaList *list2);
 #endif

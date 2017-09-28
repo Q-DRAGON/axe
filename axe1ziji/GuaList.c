@@ -95,10 +95,11 @@ GuaListAppend(GuaList *list, type element) {
 
 void
 GuaListPrepend(GuaList *list, type element) {
+    GuaList *l = list;
     GuaList *n = malloc(sizeof(GuaList));
     n->element = element;
-    n->next = list->next;
-    list->next = n;
+    n->next = l->next;
+    l->next = n;
 }
 
 int
@@ -125,4 +126,30 @@ GuaListInsertElementAtIndex(GuaList *list, type element, int index) {
     n->element = element;
     n->next = list->next;
     list->next = n;
+}
+
+// 通过下标取回值
+int
+GuaListElementOfIndex(GuaList *list, type index) {
+    for (int i = 0; i < index; i++) {
+        list = list->next;
+    }
+    // printf("%d\n", list->element);
+    return list->element;
+}
+
+// 判断两个链表是否相等
+bool
+GuaListEquals(GuaList *list1, GuaList *list2) {
+    if (GuaListLength(list1) == GuaListLength(list2)) {
+        for (int i = 0; i < GuaListLength(list1); i++) {
+            if (GuaListElementOfIndex(list1, i) != GuaListElementOfIndex(list2, i)) {
+                printf("%d\n", GuaListElementOfIndex(list1, i));
+                printf("%d\n", GuaListElementOfIndex(list2, i));
+                return false;
+            }
+        }
+        return true;
+    }
+    return false;
 }
