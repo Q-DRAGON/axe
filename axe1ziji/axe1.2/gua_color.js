@@ -17,4 +17,13 @@ class GuaColor extends GuaObject {
     static red() {
         return this.new(255, 0, 0, 255)
     }
+    static transHEXtoRGB(hex){
+        let r = hex.slice(1,3)
+        let g = hex.slice(3,5)
+        let b = hex.slice(5,7)
+        r = parseInt(r, 16)
+        g = parseInt(g, 16)
+        b = parseInt(b, 16)
+        return this.new(r, g, b, 255)
+    }
 }

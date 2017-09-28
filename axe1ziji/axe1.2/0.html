@@ -15,10 +15,13 @@
         <script src='gua_size.js'></script>
         <script src='gua_color.js'></script>
         <script src='gua_canvas.js'></script>
-        <script src='mail.js'></script>
     </head>
     <body>
         <canvas id="id-canvas" width="400" height="300"></canvas>
+        <br>
+        <button type="button" id="line">画线</button>
+        <button type="button" id="rect">画矩形</button>
+        <input type="color" id="penColor">
 <script>
 // 函数名应该用 const 修饰, 这样不会被意外修改
 const __main = function() {
@@ -26,15 +29,29 @@ const __main = function() {
     // 这是一个测试函数, 给你看原理的, 只是看看
     // canvas.__debug_draw_demo()
     // 画一条线
-    let p1 = GuaPoint.new(0, 0)
-    let p2 = GuaPoint.new(255, 128)
-    let upperLeft = GuaPoint.new(0, 0)
-    let size = GuaSize.new(30, 50)
+    // let p1 = GuaPoint.new(0, 0)
+    // let p2 = GuaPoint.new(255, 128)
+    // let upperLeft = GuaPoint.new(0, 0)
+    // let size = GuaSize.new(30, 50)
     // canvas.drawLine(p1, p2, GuaColor.black())
-    var fillColor = GuaColor.new(0, 255, 0, 255)
+    // var fillColor = GuaColor.new(0, 255, 0, 255)
     // canvas.drawRect(upperLeft, size, fillColor, GuaColor.black())
     // 渲染出来, 不调用这个函数就不会显示结果
     canvas.render()
+    var buttonLine = _e('#line')
+    var buttonRect = _e('#rect')
+    var penColor = _e('#penColor')
+    penColor.addEventListener('input', function(){
+        canvas.penColor = GuaColor.transHEXtoRGB(penColor.value)
+    })
+    buttonRect.addEventListener('click', function(){
+        canvas.drawStyle = 'rect'
+    })
+    buttonLine.addEventListener('click', function(){
+        canvas.drawStyle = 'line'
+    })
+
+
 }
 
 __main()

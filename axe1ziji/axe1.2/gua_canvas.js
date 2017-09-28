@@ -9,9 +9,13 @@ class GuaCanvas extends GuaObject {
         this.pixels = this.context.getImageData(0, 0, this.w, this.h)
         this.bytesPerPixel = 4
         // this.pixelBuffer = this.pixels.data
-        // this.start = GuaPoint.new(0, 0)
-        // this.end = GuaPoint.new(0, 0)
-        // this.enableDrag = false
+        this.start = null
+        this.end = null
+        this.listenMouse()
+        this.enableDraw = false
+        this.data = null
+        this.drawStyle = 'line'
+        this.penColor = GuaColor.black()
     }
     render() {
         // 执行这个函数后, 才会实际地把图像画出来
@@ -49,26 +53,38 @@ class GuaCanvas extends GuaObject {
         p[i+2] = b
         p[i+3] = a
     }
-    this.canvas.addEventListener('mousedown', function(event) {
-        var x = event.offsetX
-        var y = event.offsetY
-        this.start = GuaPoint.new(x, y)
-        log('mousedown')
-    })
-    this.canvas.addEventListener('mousemove', function(event) {
-        var x = event.offsetX
-        var y = event.offsetY
-        // 需要清空已画的线
-        this.end = GuaPoint.new(x, y)
-        drawLine(this.start, this.end, color=GuaColor.black())
-        log('mousemove')
-    })
-    this.canvas.addEventListener('mouseup', function(event) {
-        var x = event.offsetX
-        var y = event.offsetY
-        this.end = GuaPoint.new(x, y)
-        log('mouseup')
-    })
+    listenMouse(){
+        var self = this
+        self.canvas.addEventListener('mousedown', function(event) {
+            self.enableDraw = true
+            var x = event.offsetX
+            var y = event.offsetY
+            self.start = GuaPoint.new(x, y)
+            self.data = new Uint8ClampedArray(self.pixels.data)
+        })
+        this.canvas.addEventListener('mousemove', function(event) {
+            if (self.enableDraw == true) {
+                var x = event.offsetX
+                var y = event.offsetY
+                self.end = GuaPoint.new(x, y)
+                self.pixels.data.set(self.data)
+                if (self.drawStyle == 'line') {
+                    self.drawLine(self.start, self.end, self.penColor)
+                }else if (self.drawStyle == 'rect') {
+                    var size = GuaSize.new(self.end.x - self.start.x, self.end.y - self.start.y)
+                    self.drawRect(self.start, size, null, self.penColor)
+                }
+                self.render()
+            }
+        })
+        this.canvas.addEventListener('mouseup', function(event) {
+            self.enableDraw = false
+            var x = event.offsetX
+            var y = event.offsetY
+            self.end = GuaPoint.new(x, y)
+        })
+
+    }
     drawPoint(point, color=GuaColor.black()) {
         // point: GuaPoint
         let {w, h} = this
@@ -120,8 +136,10 @@ class GuaCanvas extends GuaObject {
         this.drawLine(p2, p3, borderColor)
         this.drawLine(p3, p4, borderColor)
         this.drawLine(p4, p1, borderColor)
-        for (var j = y + 1; j < p3.y; j++) {
-            this.drawLine(GuaPoint.new(x + 1, j), GuaPoint.new(p2.x, j),fillColor)
+        if (fillColor != null) {
+            for (var j = y + 1; j < p3.y; j++) {
+                this.drawLine(GuaPoint.new(x + 1, j), GuaPoint.new(p2.x, j), fillColor)
+            }
         }
     }
     __debug_draw_demo() {
@@ -139,8 +157,5 @@ class GuaCanvas extends GuaObject {
             data[i+3] = a
         }
         context.putImageData(pixels, 0, 0)
-    }
-    _run(){
-
     }
 }
