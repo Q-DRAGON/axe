@@ -129,13 +129,14 @@ GuaListInsertElementAtIndex(GuaList *list, type element, int index) {
 }
 
 // 通过下标取回值
-int
+type
 GuaListElementOfIndex(GuaList *list, type index) {
+    GuaList *l = list->next;
     for (int i = 0; i < index; i++) {
-        list = list->next;
+        l = l->next;
     }
-    // printf("%d\n", list->element);
-    return list->element;
+    // printf("%d\n", l->element);
+    return l->element;
 }
 
 // 判断两个链表是否相等
@@ -144,8 +145,6 @@ GuaListEquals(GuaList *list1, GuaList *list2) {
     if (GuaListLength(list1) == GuaListLength(list2)) {
         for (int i = 0; i < GuaListLength(list1); i++) {
             if (GuaListElementOfIndex(list1, i) != GuaListElementOfIndex(list2, i)) {
-                printf("%d\n", GuaListElementOfIndex(list1, i));
-                printf("%d\n", GuaListElementOfIndex(list2, i));
                 return false;
             }
         }
