@@ -9,6 +9,9 @@ class GuaCanvas extends GuaObject {
         this.pixels = this.context.getImageData(0, 0, this.w, this.h)
         this.bytesPerPixel = 4
         // this.pixelBuffer = this.pixels.data
+        // this.start = GuaPoint.new(0, 0)
+        // this.end = GuaPoint.new(0, 0)
+        // this.enableDrag = false
     }
     render() {
         // 执行这个函数后, 才会实际地把图像画出来
@@ -46,6 +49,26 @@ class GuaCanvas extends GuaObject {
         p[i+2] = b
         p[i+3] = a
     }
+    this.canvas.addEventListener('mousedown', function(event) {
+        var x = event.offsetX
+        var y = event.offsetY
+        this.start = GuaPoint.new(x, y)
+        log('mousedown')
+    })
+    this.canvas.addEventListener('mousemove', function(event) {
+        var x = event.offsetX
+        var y = event.offsetY
+        // 需要清空已画的线
+        this.end = GuaPoint.new(x, y)
+        drawLine(this.start, this.end, color=GuaColor.black())
+        log('mousemove')
+    })
+    this.canvas.addEventListener('mouseup', function(event) {
+        var x = event.offsetX
+        var y = event.offsetY
+        this.end = GuaPoint.new(x, y)
+        log('mouseup')
+    })
     drawPoint(point, color=GuaColor.black()) {
         // point: GuaPoint
         let {w, h} = this
@@ -116,5 +139,8 @@ class GuaCanvas extends GuaObject {
             data[i+3] = a
         }
         context.putImageData(pixels, 0, 0)
+    }
+    _run(){
+
     }
 }
