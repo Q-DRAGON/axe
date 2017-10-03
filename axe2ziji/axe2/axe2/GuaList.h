@@ -76,4 +76,13 @@ GuaListElementOfIndex(GuaList *list, type index);
 // 判断两个链表是否相等
 bool
 GuaListEquals(GuaList *list1, GuaList *list2);
+
+//时间复杂度 O(1), 删除并返回第一个元素
+GuaList *
+GuaListPopHead(GuaList *list);
+
+//清空list
+void
+GuaListClear(GuaList *list);
+
 #endif

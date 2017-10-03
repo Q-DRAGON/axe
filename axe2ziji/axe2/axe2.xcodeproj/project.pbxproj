@@ -10,6 +10,7 @@
 		ABFBB2531F83336D00416CA6 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = ABFBB2521F83336D00416CA6 /* main.c */; };
 		ABFBB25D1F83345500416CA6 /* GuaList.c in Sources */ = {isa = PBXBuildFile; fileRef = ABFBB2591F83345500416CA6 /* GuaList.c */; };
 		ABFBB25E1F83345500416CA6 /* GuaTest.c in Sources */ = {isa = PBXBuildFile; fileRef = ABFBB25B1F83345500416CA6 /* GuaTest.c */; };
+		ABFBB2611F83C02C00416CA6 /* GuaStack.c in Sources */ = {isa = PBXBuildFile; fileRef = ABFBB25F1F83C02C00416CA6 /* GuaStack.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -31,6 +32,8 @@
 		ABFBB25A1F83345500416CA6 /* GuaList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GuaList.h; sourceTree = "<group>"; };
 		ABFBB25B1F83345500416CA6 /* GuaTest.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = GuaTest.c; sourceTree = "<group>"; };
 		ABFBB25C1F83345500416CA6 /* GuaTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GuaTest.h; sourceTree = "<group>"; };
+		ABFBB25F1F83C02C00416CA6 /* GuaStack.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = GuaStack.c; sourceTree = "<group>"; };
+		ABFBB2601F83C02C00416CA6 /* GuaStack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GuaStack.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -68,6 +71,8 @@
 				ABFBB25A1F83345500416CA6 /* GuaList.h */,
 				ABFBB25B1F83345500416CA6 /* GuaTest.c */,
 				ABFBB25C1F83345500416CA6 /* GuaTest.h */,
+				ABFBB25F1F83C02C00416CA6 /* GuaStack.c */,
+				ABFBB2601F83C02C00416CA6 /* GuaStack.h */,
 			);
 			path = axe2;
 			sourceTree = "<group>";
@@ -131,6 +136,7 @@
 			files = (
 				ABFBB2531F83336D00416CA6 /* main.c in Sources */,
 				ABFBB25E1F83345500416CA6 /* GuaTest.c in Sources */,
+				ABFBB2611F83C02C00416CA6 /* GuaStack.c in Sources */,
 				ABFBB25D1F83345500416CA6 /* GuaList.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

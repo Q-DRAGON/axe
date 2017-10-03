@@ -173,6 +173,9 @@ main(int argc, const char * argv[]) {
     testGuaListPrepend();
     testGuaListIndexOfElement();
     testGuaListInsertElementAtIndex();
+//    GuaList *stack = GuaStackCreate();
+//    
+//    GuaStackIsEmpty(GuaList *stack)
 
     // 返回 0 表示程序执行完毕并成功退出
     return 0;
