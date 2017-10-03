@@ -18,7 +18,9 @@ typedef int type;
 // 结构的具体定义
 struct GuaNode {
     type element;
+    type length;
     GuaList *next;
+    GuaList *end;
 };
 
 
@@ -36,13 +38,25 @@ GuaListCreate(int *element, int numberOfElements) {
     list->next = NULL;
 
     // 循环插入初始化元素
+    if (numberOfElements == 0) {
+        list->end = NULL;
+        list->next = NULL;
+        list->length = 0;
+        return list;
+    }
+    list->length = numberOfElements;
     for(int i = numberOfElements - 1; i >= 0; i--) {
         GuaList *n = malloc(sizeof(GuaList));
         n->element = element[i];
+//        n->length = numberOfElements;
         n->next = list->next;
         list->next = n;
+        if (i == numberOfElements - 1) {
+            list->end = n;
+        }
     }
-
+    
+    
     return list;
 }
 
@@ -59,13 +73,11 @@ GuaListLog(GuaList *list) {
 
 int
 GuaListLength(GuaList *list) {
-    type len = 0;
-    GuaList *l = list->next;
-    while(l != NULL) {
-        len = len + 1;
-        l = l->next;
+    if (list->next == NULL) {
+        return 0;
     }
-    return len;
+//    GuaList *l = list->next;
+    return list->length;
 }
 
 bool
@@ -83,14 +95,19 @@ GuaListContains(GuaList *list, type element) {
 
 void
 GuaListAppend(GuaList *list, type element) {
-    GuaList *l = list;
-    while(l->next != NULL) {
-        l = l->next;
-    }
+    GuaList *e = list->end;
     GuaList *n = malloc(sizeof(GuaList));
     n->element = element;
     n->next = NULL;
-    l->next = n;
+    if (e == NULL) {
+        list->next = n;
+        list->end = n;
+        list->length = 1;
+    }else{
+        e->next = n;
+        list->end = n;
+        list->length += 1;
+    }
 }
 
 void
@@ -100,6 +117,7 @@ GuaListPrepend(GuaList *list, type element) {
     n->element = element;
     n->next = l->next;
     l->next = n;
+    l->length += 1;
 }
 
 int
