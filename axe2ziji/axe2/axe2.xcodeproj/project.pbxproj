@@ -11,6 +11,7 @@
 		ABFBB25D1F83345500416CA6 /* GuaList.c in Sources */ = {isa = PBXBuildFile; fileRef = ABFBB2591F83345500416CA6 /* GuaList.c */; };
 		ABFBB25E1F83345500416CA6 /* GuaTest.c in Sources */ = {isa = PBXBuildFile; fileRef = ABFBB25B1F83345500416CA6 /* GuaTest.c */; };
 		ABFBB2611F83C02C00416CA6 /* GuaStack.c in Sources */ = {isa = PBXBuildFile; fileRef = ABFBB25F1F83C02C00416CA6 /* GuaStack.c */; };
+		ABFBB2641F83D5FB00416CA6 /* GuaQueue.c in Sources */ = {isa = PBXBuildFile; fileRef = ABFBB2621F83D5FB00416CA6 /* GuaQueue.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -34,6 +35,8 @@
 		ABFBB25C1F83345500416CA6 /* GuaTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GuaTest.h; sourceTree = "<group>"; };
 		ABFBB25F1F83C02C00416CA6 /* GuaStack.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = GuaStack.c; sourceTree = "<group>"; };
 		ABFBB2601F83C02C00416CA6 /* GuaStack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GuaStack.h; sourceTree = "<group>"; };
+		ABFBB2621F83D5FB00416CA6 /* GuaQueue.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = GuaQueue.c; sourceTree = "<group>"; };
+		ABFBB2631F83D5FB00416CA6 /* GuaQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GuaQueue.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -73,6 +76,8 @@
 				ABFBB25C1F83345500416CA6 /* GuaTest.h */,
 				ABFBB25F1F83C02C00416CA6 /* GuaStack.c */,
 				ABFBB2601F83C02C00416CA6 /* GuaStack.h */,
+				ABFBB2621F83D5FB00416CA6 /* GuaQueue.c */,
+				ABFBB2631F83D5FB00416CA6 /* GuaQueue.h */,
 			);
 			path = axe2;
 			sourceTree = "<group>";
@@ -134,6 +139,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ABFBB2641F83D5FB00416CA6 /* GuaQueue.c in Sources */,
 				ABFBB2531F83336D00416CA6 /* main.c in Sources */,
 				ABFBB25E1F83345500416CA6 /* GuaTest.c in Sources */,
 				ABFBB2611F83C02C00416CA6 /* GuaStack.c in Sources */,

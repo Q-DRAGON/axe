@@ -78,7 +78,7 @@ bool
 GuaListEquals(GuaList *list1, GuaList *list2);
 
 //时间复杂度 O(1), 删除并返回第一个元素
-GuaList *
+type
 GuaListPopHead(GuaList *list);
 
 //清空list

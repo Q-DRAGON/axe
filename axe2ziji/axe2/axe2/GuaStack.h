@@ -27,7 +27,7 @@ void
 GuaStackPush(GuaStack *stack, type e);
 
 //时间复杂度 O(1), 返回栈顶的元素
-GuaStack *
+type
 GuaStackPop(GuaStack *stack);
 
 //时间复杂度 O(1), 检查栈是否为空

@@ -33,9 +33,9 @@ GuaStackPush(GuaStack *stack, type e){
 }
 
 //时间复杂度 O(1), 返回栈顶的元素
-GuaStack *
+type
 GuaStackPop(GuaStack *stack){
-    GuaStack *s = GuaListPopHead(stack);
+    type s = GuaListPopHead(stack);
     return s;
 }
 

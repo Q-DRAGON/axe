@@ -2,6 +2,8 @@
 #include <stdbool.h>
 
 #include "GuaList.h"
+#include "GuaStack.h"
+#include "GuaQueue.h"
 #include "GuaTest.h"
 
 
@@ -165,6 +167,50 @@ testGuaListInsertElementAtIndex(){
 
 }
 
+void
+testGuaStack(){
+    GuaStack *s = GuaStackCreate();
+    printf("初始化空Stack:");
+    GuaListLog(s);
+    type e1 = 1;
+    type e2 = 2;
+    GuaStackPush(s, e1);
+    GuaStackPush(s, e2);
+    printf("Stack变为 2， 1：");
+    GuaListLog(s);
+    printf("此时Stack长度 %d\n", GuaStackLength(s));
+    type pop = GuaStackPop(s);
+    printf("弹出一个元素后的Stack：");
+    GuaListLog(s);
+    printf("被弹出的元素：%d\n", pop);
+    ensure(GuaStackIsEmpty(s) == false, "test Gua Stack Is Empty");
+    GuaStackClear(s);
+    printf("清空后的Stack：");
+    GuaListLog(s);
+}
+
+void
+testGuaQueue(){
+    GuaQueue *q = GuaQueueCreate();
+    printf("初始化空Queue:");
+    GuaListLog(q);
+    type e1 = 1;
+    type e2 = 2;
+    GuaQueueEnqueue(q, e1);
+    GuaQueueEnqueue(q, e2);
+    printf("Queue变为 1， 2：");
+    GuaListLog(q);
+    printf("此时Queue长度 %d\n", GuaQueueLength(q));
+    type pop = GuaQueueDequeue(q);
+    printf("弹出一个元素后的Queue：");
+    GuaListLog(q);
+    printf("被弹出的元素：%d\n", pop);
+    ensure(GuaQueueIsEmpty(q) == false, "test Gua Queue Is Empty");
+    GuaQueueClear(q);
+    printf("清空后的Queue：");
+    GuaListLog(q);
+}
+
 int
 main(int argc, const char * argv[]) {
     testGuaListLength();
@@ -173,10 +219,9 @@ main(int argc, const char * argv[]) {
     testGuaListPrepend();
     testGuaListIndexOfElement();
     testGuaListInsertElementAtIndex();
-//    GuaList *stack = GuaStackCreate();
-//    
-//    GuaStackIsEmpty(GuaList *stack)
-
+    testGuaStack();
+    testGuaQueue();
+    
     // 返回 0 表示程序执行完毕并成功退出
     return 0;
 }
