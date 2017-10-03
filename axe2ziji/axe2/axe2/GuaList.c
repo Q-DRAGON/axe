@@ -39,7 +39,7 @@ GuaListCreate(int *element, int numberOfElements) {
 
     // 循环插入初始化元素
     if (numberOfElements == 0) {
-        list->end = NULL;
+        list->end = list;
         list->next = NULL;
         list->length = 0;
         return list;
@@ -48,7 +48,6 @@ GuaListCreate(int *element, int numberOfElements) {
     for(int i = numberOfElements - 1; i >= 0; i--) {
         GuaList *n = malloc(sizeof(GuaList));
         n->element = element[i];
-//        n->length = numberOfElements;
         n->next = list->next;
         list->next = n;
         if (i == numberOfElements - 1) {
@@ -73,10 +72,6 @@ GuaListLog(GuaList *list) {
 
 int
 GuaListLength(GuaList *list) {
-    if (list->next == NULL) {
-        return 0;
-    }
-//    GuaList *l = list->next;
     return list->length;
 }
 
@@ -99,15 +94,9 @@ GuaListAppend(GuaList *list, type element) {
     GuaList *n = malloc(sizeof(GuaList));
     n->element = element;
     n->next = NULL;
-    if (e == NULL) {
-        list->next = n;
-        list->end = n;
-        list->length = 1;
-    }else{
-        e->next = n;
-        list->end = n;
-        list->length += 1;
-    }
+    e->next = n;
+    list->end = n;
+    list->length += 1;
 }
 
 void
