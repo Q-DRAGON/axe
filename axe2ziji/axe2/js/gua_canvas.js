@@ -16,6 +16,7 @@ class GuaCanvas extends GuaObject {
         this.data = null
         this.drawStyle = 'line'
         this.penColor = GuaColor.black()
+        this.elements = []
     }
     render() {
         // 执行这个函数后, 才会实际地把图像画出来
@@ -61,16 +62,26 @@ class GuaCanvas extends GuaObject {
             var y = event.offsetY
             self.start = GuaPoint.new(x, y)
             self.data = new Uint8ClampedArray(self.pixels.data)
+            if (self.drawStyle == 'button') {
+                for (var e of self.elements) {
+                    if (e.hasMouseIn(self.start) == true) {
+                        e.action()
+                        self.data = new Uint8ClampedArray(self.pixels.data)
+                        self.drawButton(e.position, e.size, e.highlightcolor)
+                    }
+                }
+            }
         })
         this.canvas.addEventListener('mousemove', function(event) {
             if (self.enableDraw == true) {
                 var x = event.offsetX
                 var y = event.offsetY
                 self.end = GuaPoint.new(x, y)
-                self.pixels.data.set(self.data)
                 if (self.drawStyle == 'line') {
+                    self.pixels.data.set(self.data)
                     self.drawLine(self.start, self.end, self.penColor)
                 }else if (self.drawStyle == 'rect') {
+                    self.pixels.data.set(self.data)
                     var size = GuaSize.new(self.end.x - self.start.x, self.end.y - self.start.y)
                     self.drawRect(self.start, size, null, self.penColor)
                 }
@@ -82,6 +93,10 @@ class GuaCanvas extends GuaObject {
             var x = event.offsetX
             var y = event.offsetY
             self.end = GuaPoint.new(x, y)
+            if (self.drawStyle == 'button') {
+                self.pixels.data.set(self.data)
+                self.render()
+            }
         })
 
     }
@@ -147,9 +162,10 @@ class GuaCanvas extends GuaObject {
         self.drawRect(upperLeft, size, fillColor, borderColor)
         self.render()
     }
-    addElement(upperLeft, size, fillColor=null, borderColor=GuaColor.black()){
+    addElement(element){
         var self = this
-        self.drawButton(upperLeft, size, fillColor, borderColor)
+        self.drawButton(element.position, element.size)
+        self.elements.push(element)
     }
     __debug_draw_demo() {
         // 这是一个 demo 函数, 用来给你看看如何设置像素

@@ -15,12 +15,14 @@
         <script src='gua_size.js'></script>
         <script src='gua_color.js'></script>
         <script src='gua_canvas.js'></script>
+        <script src='gua_button.js'></script>
     </head>
     <body>
         <canvas id="id-canvas" width="400" height="300"></canvas>
         <br>
         <button type="button" id="line">画线</button>
         <button type="button" id="rect">画矩形</button>
+        <button type="button" id="button">按钮功能</button>
         <input type="color" id="penColor">
 <script>
 // 函数名应该用 const 修饰, 这样不会被意外修改
@@ -37,9 +39,17 @@ const __main = function() {
     // var fillColor = GuaColor.new(0, 255, 0, 255)
     // canvas.drawRect(upperLeft, size, fillColor, GuaColor.black())
     // 渲染出来, 不调用这个函数就不会显示结果
+    let v = GuaButton.new()
+    v.position = GuaPoint.new(100, 100)
+    v.size = GuaSize.new(100, 100)
+    v.addAction(function(event){
+        log('clicked 按钮')
+    })
+    canvas.addElement(v)
     canvas.render()
     var buttonLine = _e('#line')
     var buttonRect = _e('#rect')
+    var buttonButton = _e('#button')
     var penColor = _e('#penColor')
     penColor.addEventListener('input', function(){
         canvas.penColor = GuaColor.transHEXtoRGB(penColor.value)
@@ -50,7 +60,10 @@ const __main = function() {
     buttonLine.addEventListener('click', function(){
         canvas.drawStyle = 'line'
     })
-    canvas.addElement(GuaPoint.new(50, 50), GuaSize.new(50, 30), GuaColor.red(), GuaColor.black())
+    buttonButton.addEventListener('click', function(){
+        canvas.drawStyle = 'button'
+    })
+    // canvas.addElement(GuaPoint.new(50, 50), GuaSize.new(50, 30), GuaColor.red(), GuaColor.black())
 }
 
 __main()
