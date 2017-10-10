@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AB58CC471F8D23A700539B68 /* GuaHashTable.c in Sources */ = {isa = PBXBuildFile; fileRef = AB58CC451F8D23A700539B68 /* GuaHashTable.c */; };
 		ABFBB2531F83336D00416CA6 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = ABFBB2521F83336D00416CA6 /* main.c */; };
 		ABFBB25D1F83345500416CA6 /* GuaList.c in Sources */ = {isa = PBXBuildFile; fileRef = ABFBB2591F83345500416CA6 /* GuaList.c */; };
 		ABFBB25E1F83345500416CA6 /* GuaTest.c in Sources */ = {isa = PBXBuildFile; fileRef = ABFBB25B1F83345500416CA6 /* GuaTest.c */; };
@@ -27,6 +28,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		AB58CC451F8D23A700539B68 /* GuaHashTable.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = GuaHashTable.c; sourceTree = "<group>"; };
+		AB58CC461F8D23A700539B68 /* GuaHashTable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GuaHashTable.h; sourceTree = "<group>"; };
 		ABFBB24F1F83336D00416CA6 /* axe2 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = axe2; sourceTree = BUILT_PRODUCTS_DIR; };
 		ABFBB2521F83336D00416CA6 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		ABFBB2591F83345500416CA6 /* GuaList.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = GuaList.c; sourceTree = "<group>"; };
@@ -78,6 +81,8 @@
 				ABFBB2601F83C02C00416CA6 /* GuaStack.h */,
 				ABFBB2621F83D5FB00416CA6 /* GuaQueue.c */,
 				ABFBB2631F83D5FB00416CA6 /* GuaQueue.h */,
+				AB58CC451F8D23A700539B68 /* GuaHashTable.c */,
+				AB58CC461F8D23A700539B68 /* GuaHashTable.h */,
 			);
 			path = axe2;
 			sourceTree = "<group>";
@@ -143,6 +148,7 @@
 				ABFBB2531F83336D00416CA6 /* main.c in Sources */,
 				ABFBB25E1F83345500416CA6 /* GuaTest.c in Sources */,
 				ABFBB2611F83C02C00416CA6 /* GuaStack.c in Sources */,
+				AB58CC471F8D23A700539B68 /* GuaHashTable.c in Sources */,
 				ABFBB25D1F83345500416CA6 /* GuaList.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
