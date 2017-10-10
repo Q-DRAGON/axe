@@ -62,13 +62,13 @@ testGuaListAppend(){
 //    GuaListLog(l11);
     ensure(GuaListEquals(l1, l11) == true, "test gua list append 1");
 
-    type a2[] = {};
-    int n2 = 0;
+    type a2[] = {2};
+    int n2 = 1;
     GuaList *l2 = GuaListCreate(a2, n2);
     GuaListAppend(l2, 1);
 //    GuaListLog(l2);
-    type a22[] = {1};
-    int n22 = 1;
+    type a22[] = {2, 1};
+    int n22 = 2;
     GuaList *l22 = GuaListCreate(a22, n22);
 //    GuaListLog(l22);
     ensure(GuaListEquals(l2, l22) == true, "test gua list append 2");
@@ -98,13 +98,13 @@ testGuaListPrepend(){
 //    GuaListLog(l11);
     ensure(GuaListEquals(l1, l11) == true, "test gua list prepend 1");
 
-    type a2[] = {};
-    int n2 = 0;
+    type a2[] = {2};
+    int n2 = 1;
     GuaList *l2 = GuaListCreate(a2, n2);
     GuaListPrepend(l2, 1);
 //    GuaListLog(l2);
-    type a22[] = {1};
-    int n22 = 1;
+    type a22[] = {1, 2};
+    int n22 = 2;
     GuaList *l22 = GuaListCreate(a22, n22);
 //    GuaListLog(l22);
     ensure(GuaListEquals(l2, l22) == true, "test gua list prepend 2");
@@ -156,14 +156,14 @@ testGuaListInsertElementAtIndex(){
     type a2[] = {1, 2, 3};
     int n2 = 3;
     GuaList *l2 = GuaListCreate(a2, n2);
-    GuaListInsertElementAtIndex(l2, 6, 0);
-    ensure( GuaListIndexOfElement(l2, 6) == 0, "Gua List Insert Element At Index 2");
+    GuaListInsertElementAtIndex(l2, 6, 1);
+    ensure( GuaListIndexOfElement(l2, 6) == 1, "Gua List Insert Element At Index 2");
 
-    type a3[] = {};
-    int n3 = 0;
+    type a3[] = {1};
+    int n3 = 1;
     GuaList *l3 = GuaListCreate(a3, n3);
-    GuaListInsertElementAtIndex(l3, 6, 0);
-    ensure( GuaListIndexOfElement(l3, 6) == 0, "Gua List Insert Element At Index 3");
+    GuaListInsertElementAtIndex(l3, 6, 1);
+    ensure( GuaListIndexOfElement(l3, 6) == 1, "Gua List Insert Element At Index 3");
 
 }
 
@@ -171,44 +171,44 @@ void
 testGuaStack(){
     GuaStack *s = GuaStackCreate();
     printf("初始化空Stack:");
-    GuaListLog(s);
+    GuaStackLog(s);
     type e1 = 1;
     type e2 = 2;
     GuaStackPush(s, e1);
     GuaStackPush(s, e2);
     printf("Stack变为 2， 1：");
-    GuaListLog(s);
+    GuaStackLog(s);
     printf("此时Stack长度 %d\n", GuaStackLength(s));
     type pop = GuaStackPop(s);
     printf("弹出一个元素后的Stack：");
-    GuaListLog(s);
+    GuaStackLog(s);
     printf("被弹出的元素：%d\n", pop);
     ensure(GuaStackIsEmpty(s) == false, "test Gua Stack Is Empty");
     GuaStackClear(s);
     printf("清空后的Stack：");
-    GuaListLog(s);
+    GuaStackLog(s);
 }
 
 void
 testGuaQueue(){
     GuaQueue *q = GuaQueueCreate();
     printf("初始化空Queue:");
-    GuaListLog(q);
+    GuaQueueLog(q);
     type e1 = 1;
     type e2 = 2;
     GuaQueueEnqueue(q, e1);
     GuaQueueEnqueue(q, e2);
     printf("Queue变为 1， 2：");
-    GuaListLog(q);
+    GuaQueueLog(q);
     printf("此时Queue长度 %d\n", GuaQueueLength(q));
     type pop = GuaQueueDequeue(q);
     printf("弹出一个元素后的Queue：");
-    GuaListLog(q);
+    GuaQueueLog(q);
     printf("被弹出的元素：%d\n", pop);
     ensure(GuaQueueIsEmpty(q) == false, "test Gua Queue Is Empty");
     GuaQueueClear(q);
     printf("清空后的Queue：");
-    GuaListLog(q);
+    GuaQueueLog(q);
 }
 
 int

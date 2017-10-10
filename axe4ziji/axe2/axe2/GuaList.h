@@ -14,10 +14,11 @@ C 语言中的 #include 的意思实际上是复制整个文件的内容过来
 
 // interface
 // 声明 结构名, 类型
-struct GuaNode;
-typedef struct GuaNode GuaList;
+struct GuaNodeStruct;
+typedef struct GuaNodeStruct GuaNode;
+struct GuaListStruct;
+typedef struct GuaListStruct GuaList;
 typedef int type;
-
 
 GuaList *
 GuaListCreate(int *element, int numberOfElements);
@@ -84,5 +85,11 @@ GuaListPopHead(GuaList *list);
 //清空list
 void
 GuaListClear(GuaList *list);
+
+void
+GuaListRemoveFirstElement(GuaList *list);
+
+type
+GuaListFirstElement(GuaList *list);
 
 #endif

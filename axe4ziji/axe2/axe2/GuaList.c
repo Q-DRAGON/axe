@@ -8,19 +8,16 @@
 //创建两个单链表A、B,要求A、B 的元素按升序排列,输出单链表A、B,
 //然后将A、B中相同的元素放在单链表C中，C也按升序排列，输出单链表C。
 
-
-// interface
-// 声明 结构名, 类型
-struct GuaNode;
-typedef struct GuaNode GuaList;
-typedef int type;
-
 // 结构的具体定义
-struct GuaNode {
+struct GuaNodeStruct {
     type element;
-    type length;
-    GuaList *next;
-    GuaList *end;
+    GuaNode *next;
+};
+
+struct GuaListStruct {
+    int length;
+    GuaNode *tail;
+    GuaNode *next;
 };
 
 
@@ -36,25 +33,20 @@ GuaListCreate(int *element, int numberOfElements) {
     // malloc 申请一块内存, 并初始化一下
     GuaList *list = malloc(sizeof(GuaList));
     list->next = NULL;
+    list->length = numberOfElements;
 
     // 循环插入初始化元素
-    if (numberOfElements == 0) {
-        list->end = list;
-        list->next = NULL;
-        list->length = 0;
-        return list;
-    }
-    list->length = numberOfElements;
     for(int i = numberOfElements - 1; i >= 0; i--) {
-        GuaList *n = malloc(sizeof(GuaList));
+        GuaNode *n = malloc(sizeof(GuaNode));
         n->element = element[i];
         n->next = list->next;
+        //
         list->next = n;
+        // 设置 tail
         if (i == numberOfElements - 1) {
-            list->end = n;
+            list->tail = n;
         }
     }
-    
     
     return list;
 }
@@ -62,7 +54,7 @@ GuaListCreate(int *element, int numberOfElements) {
 // 把一个 List 的数据打印出来
 void
 GuaListLog(GuaList *list) {
-    GuaList *l = list->next;
+    GuaNode *l = list->next;
     while(l != NULL) {
         printf("%d  ", l->element);
         l = l->next;
@@ -77,48 +69,50 @@ GuaListLength(GuaList *list) {
 
 bool
 GuaListContains(GuaList *list, type element) {
-    GuaList *l = list->next;
+    GuaNode *l = list->next;
     while(l != NULL) {
         if (l->element == element) {
             return true;
-        }else{
-            l = l->next;
         }
+        l = l->next;
     }
     return false;
 }
 
 void
 GuaListAppend(GuaList *list, type element) {
-    GuaList *e = list->end;
-    GuaList *n = malloc(sizeof(GuaList));
+    GuaNode *n = malloc(sizeof(GuaNode));
     n->element = element;
     n->next = NULL;
-    e->next = n;
-    list->end = n;
-    list->length += 1;
+    if (list->tail == NULL) {
+        list->next = n;
+    } else {
+        list->tail->next = n;
+    }
+    list->tail = n;
+    list->length++;
 }
 
 void
 GuaListPrepend(GuaList *list, type element) {
-    GuaList *l = list;
-    GuaList *n = malloc(sizeof(GuaList));
+    list->length++;
+    GuaNode *n = malloc(sizeof(GuaNode));
     n->element = element;
-    n->next = l->next;
-    l->next = n;
-    l->length += 1;
+    n->next = list->next;
+    list->next = n;
 }
 
 int
 GuaListIndexOfElement(GuaList *list, type element) {
-    GuaList *l = list->next;
-    type count = -1;
-    type index = -1;
+    int index = -1;
+    int i = 0;
+    GuaNode *l = list->next;
     while(l != NULL) {
-        count = count + 1;
         if (l->element == element) {
-            index = count;
+            index = i;
+            break;
         }
+        i++;
         l = l->next;
     }
     return index;
@@ -126,24 +120,33 @@ GuaListIndexOfElement(GuaList *list, type element) {
 
 void
 GuaListInsertElementAtIndex(GuaList *list, type element, int index) {
-    for (int i = 0; i < index; i++) {
-        list = list->next;
-    }
-    GuaList *n = malloc(sizeof(GuaList));
+    GuaNode *n = malloc(sizeof(GuaNode));
     n->element = element;
-    n->next = list->next;
-    list->next = n;
+    GuaNode *l = list->next;
+    if (index == 0) {
+        n->next = l;
+        list->next = n;
+    }
+    int i = 1;
+    while (l != NULL) {
+        if (i == index) {
+            n->next = l->next;
+            l->next = n;
+        }
+        i++;
+        l = l->next;
+    }
+    list->length++;
 }
 
 // 通过下标取回值
 type
 GuaListElementOfIndex(GuaList *list, type index) {
-    GuaList *l = list->next;
+    GuaNode *n = list->next;
     for (int i = 0; i < index; i++) {
-        l = l->next;
+        n = n->next;
     }
-    // printf("%d\n", l->element);
-    return l->element;
+    return n->element;
 }
 
 // 判断两个链表是否相等
@@ -163,10 +166,9 @@ GuaListEquals(GuaList *list1, GuaList *list2) {
 //时间复杂度 O(1), 删除并返回第一个元素
 type
 GuaListPopHead(GuaList *list){
-    GuaList *l = list->next;
-    list->next = list->next->next;
-    list->length -= 1;
-    return l->element;
+    type a = GuaListFirstElement(list);
+    GuaListRemoveFirstElement(list);
+    return a;
 }
 
 //清空list
@@ -177,3 +179,20 @@ GuaListClear(GuaList *list){
         list->next = list->next->next;
     }
 }
+
+//移除首元素
+void
+GuaListRemoveFirstElement(GuaList *list) {
+    list->length--;
+    //
+    GuaNode *n = list->next;
+    list->next = n->next;
+    free(n);
+}
+
+//返回首元素
+type
+GuaListFirstElement(GuaList *list) {
+    return list->next->element;
+}
+
