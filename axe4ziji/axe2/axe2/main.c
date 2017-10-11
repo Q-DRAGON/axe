@@ -5,7 +5,7 @@
 #include "GuaStack.h"
 #include "GuaQueue.h"
 #include "GuaTest.h"
-
+#include "GuaHashTable.h"
 
 void
 testGuaListLength() {
@@ -211,17 +211,29 @@ testGuaQueue(){
     GuaQueueLog(q);
 }
 
+void
+testHashTableTest(){
+    GuaHashTable *ht = GuaHashTableCreate();
+    GuaHashTableSet(ht, "x", 11);
+    ensure(GuaHashTableHas(ht, "x") == true, "test Hash Table Has 1");
+    ensure(GuaHashTableHas(ht, "c") == false, "test Hash Table Has 2");
+    ensure(GuaHashTableGet(ht, "x") == 11, "test Hash Table Get 1");
+    GuaHashTableRemove(ht);
+}
+
 int
 main(int argc, const char * argv[]) {
-    testGuaListLength();
-    testGuaListContains();
-    testGuaListAppend();
-    testGuaListPrepend();
-    testGuaListIndexOfElement();
-    testGuaListInsertElementAtIndex();
-    testGuaStack();
-    testGuaQueue();
+//    testGuaListLength();
+//    testGuaListContains();
+//    testGuaListAppend();
+//    testGuaListPrepend();
+//    testGuaListIndexOfElement();
+//    testGuaListInsertElementAtIndex();
+//    testGuaStack();
+//    testGuaQueue();
     
     // 返回 0 表示程序执行完毕并成功退出
+    testHashTableTest();
+    
     return 0;
 }

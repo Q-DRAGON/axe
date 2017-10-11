@@ -12,13 +12,19 @@
 #include <stdbool.h>
 // 声明 结构名, 类型
 struct GuaHashStruct;
-typedef struct GuaHashStruct GuaHashTable;
+typedef struct GuaHashNodeStruct GuaHashNode;
+typedef struct GuaHashTableStruct GuaHashTable;
 typedef int type;
-typedef char ch;
+
+int
+hash_33(const char *key);
 
 // 创建并返回一个 hashtable
 GuaHashTable *
 GuaHashTableCreate(void);
+
+void
+GuaHashTableLog(GuaHashTable *table);
 
 // 往 hashtbale 中设置一个值, GuaHashTable 只支持 int 类型的值
 void
