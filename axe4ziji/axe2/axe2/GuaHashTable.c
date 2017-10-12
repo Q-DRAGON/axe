@@ -27,6 +27,7 @@ hash_33(const char *key)
     while (*key) {
         hash = (hash << 5) + hash + *key++;
     }
+    // printf("hash:%d\n", hash);
     return hash;
 }
 
@@ -44,6 +45,7 @@ GuaHashTableLog(GuaHashTable *table) {
     for (type i = 0; i < INIT_TABLE_SIZE; i++) {
         GuaHashNode *n = table->elements[i];
         if (n != NULL) {
+            printf("i is %d ,\n", i);
             printf("key is %s ,\n", n->key);
             printf("val is %d ;\n", n->val);
         }
@@ -59,21 +61,22 @@ GuaHashTableSet(GuaHashTable *table, const char *key, int value){
     n->next = NULL;
     int i = hash_33(key) % INIT_TABLE_SIZE;
     GuaHashNode *new = table->elements[i];
-    if (new == NULL) {
-        new = n;
-    }else if (new->key == key){
-        new->val = value;
+    if (table->elements[i] == NULL) {
+        // new = n;
+        table->elements[i] = n;
+    }else if (new->key == n->key){
+        table->elements[i] = n;
     }else{
+        // printf("%d\n", i);
         while (table->elements[i] != NULL) {
             i++;
+            // if (i >= INIT_TABLE_SIZE) {
+            //     i = 0;
+            // }
         }
-        if (i == INIT_TABLE_SIZE - 1) {
-            printf("溢出！");
-        }else{
-            table->elements[i] = n;
-        }
+        // printf("%d\n", i);
+        table->elements[i] = n;
     }
-//    GuaHashTableLog(table);
 }
 
 // 检查 hashtable 中是否存在这个 key
@@ -81,18 +84,41 @@ bool
 GuaHashTableHas(GuaHashTable *table, const char *key){
     int i = hash_33(key) % INIT_TABLE_SIZE;
     GuaHashNode *n = table->elements[i];
-    if(n == NULL || n->key != key){
+    if(n == NULL){
+        return false;
+    }else if(n->key == key){
+        return true;
+    }else{
+        while (table->elements[i] != NULL) {
+            i++;
+            GuaHashNode *new = table->elements[i];
+            if (new->key == key) {
+                return true;
+            }
+        }
         return false;
     }
-    return true;
 }
 
 // 返回 hashtable 中 key 对应的值, 不考虑 key 不存在的情况, 用户应该用 GuaHashTableHas 自行检查是否存在
 int
 GuaHashTableGet(GuaHashTable *table, const char *key){
     int i = hash_33(key) % INIT_TABLE_SIZE;
+    // printf("i %d\n", i);
     GuaHashNode *n = table->elements[i];
-    return n->val;
+    if (n->key == key) {
+        // printf("n->val %d\n", n->val);
+        return n->val;
+    }else{
+        GuaHashNode *new = table->elements[i];
+        while (new->key != key) {
+            i++;
+            new = table->elements[i];
+            // printf("i2 %d\n", i);
+        }
+        // GuaHashNode *new = table->elements[i];
+        return new->val;
+    }
 }
 
 // 销毁一个 hashtable

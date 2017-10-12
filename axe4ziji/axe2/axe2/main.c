@@ -213,27 +213,54 @@ testGuaQueue(){
 
 void
 testHashTableTest(){
-    GuaHashTable *ht = GuaHashTableCreate();
-    GuaHashTableSet(ht, "x", 11);
-    ensure(GuaHashTableHas(ht, "x") == true, "test Hash Table Has 1");
-    ensure(GuaHashTableHas(ht, "c") == false, "test Hash Table Has 2");
-    ensure(GuaHashTableGet(ht, "x") == 11, "test Hash Table Get 1");
-    GuaHashTableRemove(ht);
+    // 普通情况。
+    GuaHashTable *ht1 = GuaHashTableCreate();
+    GuaHashTableSet(ht1, "x", 11);
+    GuaHashTableSet(ht1, "r", 12);
+    ensure(GuaHashTableHas(ht1, "x") == true, "test Hash Table Has 11");
+    ensure(GuaHashTableHas(ht1, "r") == true, "test Hash Table Has 12");
+    ensure(GuaHashTableHas(ht1, "c") == false, "test Hash Table Has 13");
+    ensure(GuaHashTableGet(ht1, "x") == 11, "test Hash Table Get 11");
+    ensure(GuaHashTableGet(ht1, "r") == 12, "test Hash Table Get 12");
+    GuaHashTableRemove(ht1);
+
+    // 新元素与旧元素key相同，value不相同的情况。
+    GuaHashTable *ht2 = GuaHashTableCreate();
+    GuaHashTableSet(ht2, "x", 11);
+    GuaHashTableSet(ht2, "x", 12);
+    // GuaHashTableLog(ht2);
+    ensure(GuaHashTableHas(ht2, "x") == true, "test Hash Table Has 21");
+    ensure(GuaHashTableHas(ht2, "c") == false, "test Hash Table Has 22");
+    ensure(GuaHashTableGet(ht2, "x") == 12, "test Hash Table Get 21");
+    GuaHashTableRemove(ht2);
+
+    // 新元素与旧元素都在table表第0位，测试新元素是否能后延存到第1位。
+    GuaHashTable *ht3 = GuaHashTableCreate();
+    // x和d在hashtable中算出的i原本是一样的
+    GuaHashTableSet(ht3, "x", 11);
+    GuaHashTableSet(ht3, "d", 12);
+    ensure(GuaHashTableHas(ht3, "x") == true, "test Hash Table Has 31");
+    ensure(GuaHashTableHas(ht3, "c") == false, "test Hash Table Has 32");
+    ensure(GuaHashTableHas(ht3, "d") == true, "test Hash Table Has 33");
+    // GuaHashTableLog(ht3);
+    ensure(GuaHashTableGet(ht3, "x") == 11, "test Hash Table Get 31");
+    ensure(GuaHashTableGet(ht3, "d") == 12, "test Hash Table Get 32");
+    GuaHashTableRemove(ht3);
 }
 
 int
 main(int argc, const char * argv[]) {
-//    testGuaListLength();
-//    testGuaListContains();
-//    testGuaListAppend();
-//    testGuaListPrepend();
-//    testGuaListIndexOfElement();
-//    testGuaListInsertElementAtIndex();
-//    testGuaStack();
-//    testGuaQueue();
-    
+   // testGuaListLength();
+   // testGuaListContains();
+   // testGuaListAppend();
+   // testGuaListPrepend();
+   // testGuaListIndexOfElement();
+   // testGuaListInsertElementAtIndex();
+   // testGuaStack();
+   // testGuaQueue();
+   testHashTableTest();
     // 返回 0 表示程序执行完毕并成功退出
-    testHashTableTest();
-    
+
+
     return 0;
 }
