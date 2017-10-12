@@ -4,10 +4,6 @@
 #include <assert.h>
 #include "GuaHashTable.h"
 
-//http://blog.csdn.net/smstong/article/details/51145786
-//http://blog.sina.com.cn/s/blog_4ab888000102wqf3.html
-//http://blog.chinaunix.net/uid-20620288-id-3126653.html
-
 #define INIT_TABLE_SIZE 10
 struct GuaHashNodeStruct{
     GuaHashNode *next;
