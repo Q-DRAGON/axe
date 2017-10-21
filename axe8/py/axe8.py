@@ -68,20 +68,19 @@ def parsed_json(tokens):
     不要求支持嵌套字典和嵌套数组
     """
     if tokens[0] == '{':
-        dict = {}
+        d = {}
         for i, s in enumerate(tokens):
-            if tokens[i] == ':':
-                dict[tokens[i - 1]] = tokens[i + 1]
-        return dict
+            if s == ':':
+                d[tokens[i - 1]] = tokens[i + 1]
+        return d
     elif tokens[0] == '[':
         array = []
         for i, s in enumerate(tokens):
-            if tokens[i] in [',', ']'] and tokens[i - 1] not in ['[', ']']:
+            if s in [',', ']'] and tokens[i - 1] not in ['[', ']']:
                 array.append(tokens[i - 1])
         return array
-
-
-pass
+    else:
+        return tokens
 
 
 def test_json_tokens():
