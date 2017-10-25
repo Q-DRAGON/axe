@@ -154,17 +154,28 @@ def parsed_json(tokens):
         d = {}
         for i, s in enumerate(tokens):
             if s.value == ':':
-                if tokens[i + 1].type == Type.number:
-                    d[tokens[i - 1].value] = int(tokens[i + 1].value)
-                elif tokens[i + 1].type == Type.true:
-                    d[tokens[i - 1].value] = True
-                elif tokens[i + 1].type == Type.false:
-                    d[tokens[i - 1].value] = False
-                elif tokens[i + 1].type == Type.null:
-                    d[tokens[i - 1].value] = None
+                # log('i', i+1, len(tokens), tokens)
+                next_token = tokens[i + 1]
+                former_token = tokens[i - 1]
+                if next_token.type == Type.number:
+                    d[former_token.value] = int(tokens[i + 1].value)
+                elif next_token.type == Type.true:
+                    d[former_token.value] = True
+                elif next_token.type == Type.false:
+                    d[former_token.value] = False
+                elif next_token.type == Type.null:
+                    d[former_token.value] = None
+                elif next_token.type == Type.braceLeft:
+                    start = i + 1
+                    for j, ns in enumerate(tokens[start:]):
+                        if ns.type == Type.braceRight:
+                            end = i + j
+                            break
+                    new_token = tokens[start:end + 1]
+                    inside_json = parsed_json(new_token)
+                    d[former_token.value] = inside_json
                 else:
-                    d[tokens[i - 1].value] = tokens[i + 1].value
-                # log('value', tokens[i + 1].value, type(tokens[i + 1].value), tokens[i + 1].type)
+                    d[former_token.value] = next_token.value
         return d
     elif tokens[0].value == '[':
         array = []
@@ -193,9 +204,20 @@ def test_json():
     num2 = json_tokens(string2)
     ensure(parsed_json(num2) == json.loads(string2), 'testJson2')
 
-    string3 = r'{}'
+    string3 = r"""
+{
+    "student":
+    {
+        "a" : 168,
+        "b" : 124
+    },
+}"""
     num3 = json_tokens(string3)
-    ensure(parsed_json(num3) == eval(string3), 'testJson3')
+    json3 = parsed_json(num3)
+    log(num3)
+    log(json3)
+
+    # ensure(parsed_json(num3) == eval(string3), 'testJson3')
 
 
 def ensure(condition, message):
