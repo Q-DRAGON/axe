@@ -160,38 +160,81 @@ def parsed_word(next_token):
     return next_value
 
 
+def parsed_brace(tokens):
+    d = {}
+    i = 0
+    while i < len(tokens):
+        if tokens[i].value == ':':
+            next_token = tokens[i + 1]
+            former_token = tokens[i - 1]
+            if next_token.type in [Type.number, Type.true, Type.false, Type.null]:
+                d[former_token.value] = parsed_word(next_token)
+                i += 1
+            elif next_token.type in [Type.braceLeft, Type.bracketLeft]:
+                start = i + 1
+                reversed_tokens = tokens[start: -1][::-1]
+                if next_token.type == Type.braceLeft:
+                    to_find = Type.braceRight
+                else:
+                    to_find = Type.bracketRight
+                end = -1
+                for j, ns in enumerate(reversed_tokens):
+                    if ns.type == to_find:
+                        end = len(tokens) - j - 1
+                        break
+                new_token = tokens[start: end + 1]
+                # log('new', new_token)
+                inside_json = parsed_json(new_token)
+                d[former_token.value] = inside_json
+                i = i + len(new_token) + 1
+            else:
+                d[former_token.value] = next_token.value
+                i += 1
+        else:
+            i += 1
+    return d
+
+
+def parsed_bracket(tokens):
+    array = []
+    i = 1
+    while i < len(tokens):
+        if tokens[i].type in [Type.number, Type.true, Type.false, Type.null]:
+            array.append(parsed_word(tokens[i]))
+            i += 1
+        elif tokens[i].type in [Type.braceLeft, Type.bracketLeft]:
+            start = i
+            reversed_tokens = tokens[start: -1][::-1]
+            if tokens[i].type == Type.braceLeft:
+                to_find = Type.braceRight
+            else:
+                to_find = Type.bracketRight
+            end = -1
+            for j, ns in enumerate(reversed_tokens):
+                if ns.type == to_find:
+                    end = len(tokens) - j - 1
+                    break
+            new_token = tokens[start: end + 1]
+            inside_json = parsed_json(new_token)
+            array.append(inside_json)
+            i += len(new_token)
+        elif tokens[i].value in [',', ']'] and tokens[i - 1].value not in ['[', ']', ',', '{', '}']:
+            array.append(tokens[i - 1].value)
+            i += 1
+        else:
+            i += 1
+    return array
+
+
 def parsed_json(tokens):
     """
     tokens 是一个包含各种 JSON token 的数组（ json_tokens 的返回值）
     返回解析后的 字典
     """
     if tokens[0].value == '{':
-        d = {}
-        for i, s in enumerate(tokens):
-            if s.value == ':':
-                # log('i', i+1, len(tokens), tokens)
-                next_token = tokens[i + 1]
-                former_token = tokens[i - 1]
-                if next_token.type in [Type.number, Type.true, Type.false, Type.null]:
-                    d[former_token.value] = parsed_word(next_token)
-                elif next_token.type in [Type.braceLeft, Type.bracketLeft]:
-                    start = i + 1
-                    for j, ns in enumerate(tokens[start:]):
-                        if ns.type == Type.braceRight:
-                            end = i + j
-                            break
-                    new_token = tokens[start:end + 1]
-                    inside_json = parsed_json(new_token)
-                    d[former_token.value] = inside_json
-                else:
-                    d[former_token.value] = next_token.value
-        return d
+        return parsed_brace(tokens)
     elif tokens[0].value == '[':
-        array = []
-        for i, s in enumerate(tokens):
-            if s.value in [',', ']'] and tokens[i - 1].value not in ['[', ']']:
-                array.append(tokens[i - 1].value)
-        return array
+        return parsed_bracket(tokens)
     else:
         return tokens
 
@@ -223,13 +266,13 @@ def test_json():
         "a" : 168,
         "b" : 124
     },
+    "classroom":
+    ["SX101", "SX102", "SX103"]
 }"""
     num3 = json_tokens(string3)
-    json3 = parsed_json(num3)
-    log(num3)
-    log(json3)
-
-    # ensure(parsed_json(num3) == eval(string3), 'testJson3')
+    # log(parsed_json(num3))
+    # log(json.loads(string3))
+    ensure(parsed_json(num3) == json.loads(string3), 'testJson3')
 
 
 def ensure(condition, message):
