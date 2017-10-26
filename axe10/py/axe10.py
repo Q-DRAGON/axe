@@ -160,6 +160,24 @@ def parsed_word(next_token):
     return next_value
 
 
+def inner_tokens(i, tokens):
+    start = i
+    reversed_tokens = tokens[start: -1][::-1]
+    if tokens[i].type == Type.braceLeft:
+        to_find = Type.braceRight
+    else:
+        to_find = Type.bracketRight
+    end = -1
+    for j, ns in enumerate(reversed_tokens):
+        if ns.type == to_find:
+            end = len(tokens) - j - 1
+            break
+    new_token = tokens[start: end + 1]
+    inside_json = parsed_json(new_token)
+    i += len(new_token)
+    return inside_json, i
+
+
 def parsed_brace(tokens):
     d = {}
     i = 0
@@ -171,22 +189,8 @@ def parsed_brace(tokens):
                 d[former_token.value] = parsed_word(next_token)
                 i += 1
             elif next_token.type in [Type.braceLeft, Type.bracketLeft]:
-                start = i + 1
-                reversed_tokens = tokens[start: -1][::-1]
-                if next_token.type == Type.braceLeft:
-                    to_find = Type.braceRight
-                else:
-                    to_find = Type.bracketRight
-                end = -1
-                for j, ns in enumerate(reversed_tokens):
-                    if ns.type == to_find:
-                        end = len(tokens) - j - 1
-                        break
-                new_token = tokens[start: end + 1]
-                # log('new', new_token)
-                inside_json = parsed_json(new_token)
+                inside_json, i = inner_tokens(i + 1, tokens)
                 d[former_token.value] = inside_json
-                i = i + len(new_token) + 1
             else:
                 d[former_token.value] = next_token.value
                 i += 1
@@ -203,21 +207,8 @@ def parsed_bracket(tokens):
             array.append(parsed_word(tokens[i]))
             i += 1
         elif tokens[i].type in [Type.braceLeft, Type.bracketLeft]:
-            start = i
-            reversed_tokens = tokens[start: -1][::-1]
-            if tokens[i].type == Type.braceLeft:
-                to_find = Type.braceRight
-            else:
-                to_find = Type.bracketRight
-            end = -1
-            for j, ns in enumerate(reversed_tokens):
-                if ns.type == to_find:
-                    end = len(tokens) - j - 1
-                    break
-            new_token = tokens[start: end + 1]
-            inside_json = parsed_json(new_token)
+            inside_json, i = inner_tokens(i, tokens)
             array.append(inside_json)
-            i += len(new_token)
         elif tokens[i].value in [',', ']'] and tokens[i - 1].value not in ['[', ']', ',', '{', '}']:
             array.append(tokens[i - 1].value)
             i += 1
