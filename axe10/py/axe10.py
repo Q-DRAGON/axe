@@ -145,6 +145,21 @@ def json_tokens(code):
     return tokens
 
 
+def parsed_word(next_token):
+    # 处理数字、true、false、null
+    if next_token.type == Type.number:
+        next_value = int(next_token.value)
+    elif next_token.type == Type.true:
+        next_value = True
+    elif next_token.type == Type.false:
+        next_value = False
+    elif next_token.type == Type.null:
+        next_value = None
+    else:
+        next_value = None
+    return next_value
+
+
 def parsed_json(tokens):
     """
     tokens 是一个包含各种 JSON token 的数组（ json_tokens 的返回值）
@@ -157,15 +172,9 @@ def parsed_json(tokens):
                 # log('i', i+1, len(tokens), tokens)
                 next_token = tokens[i + 1]
                 former_token = tokens[i - 1]
-                if next_token.type == Type.number:
-                    d[former_token.value] = int(tokens[i + 1].value)
-                elif next_token.type == Type.true:
-                    d[former_token.value] = True
-                elif next_token.type == Type.false:
-                    d[former_token.value] = False
-                elif next_token.type == Type.null:
-                    d[former_token.value] = None
-                elif next_token.type == Type.braceLeft:
+                if next_token.type in [Type.number, Type.true, Type.false, Type.null]:
+                    d[former_token.value] = parsed_word(next_token)
+                elif next_token.type in [Type.braceLeft, Type.bracketLeft]:
                     start = i + 1
                     for j, ns in enumerate(tokens[start:]):
                         if ns.type == Type.braceRight:
@@ -202,6 +211,9 @@ def test_json():
 """
     import json
     num2 = json_tokens(string2)
+    # log(num2)
+    # log(parsed_json(num2))
+    # log(json.loads(string2))
     ensure(parsed_json(num2) == json.loads(string2), 'testJson2')
 
     string3 = r"""
