@@ -1,6 +1,9 @@
 from enum import Enum
 
 
+variables = {}
+
+
 class Type(Enum):
     auto = 0  # auto 就是 6 个单字符符号, 用来方便写代码的
     colon = 1              # :
@@ -27,6 +30,7 @@ class Type(Enum):
     less = 22
     log = 23
     choice = 24
+    set = 25
 
 
 class Token(object):
@@ -131,6 +135,9 @@ def keyword_end(code, index):
     elif code[offset - 1: offset + 1] == 'no':
         offset += 1
         return 'no', offset
+    elif code[offset - 1: offset + 2] == 'set':
+        offset += 2
+        return 'set', offset
     else:
         # 错误字符则程序报错
         pass
@@ -172,7 +179,7 @@ def json_tokens(code):
             t = Token(Type.number, n)
             # log('token', type(n))
             tokens.append(t)
-        elif c in 'tfnyli':
+        elif c in 'tfnylis':
             # 处理关键词 true, false, null, yes, no, log
             s, offset = keyword_end(code, i)
             i = offset
@@ -190,6 +197,8 @@ def json_tokens(code):
                 t = Token(Type.yes, s)
             elif s == 'no':
                 t = Token(Type.no, s)
+            elif s == 'set':
+                t = Token(Type.set, s)
             else:
                 continue
             tokens.append(t)
@@ -334,8 +343,8 @@ def apply_if(tokens):
         return apply_tokens(statement_no)
 
 
-def apply_tokens(tokens):
-    # 根据token的关键词是yes/no/number/log/if/公式 进行不同的操作
+def apply_tokens(tokens, varis):
+    # 根据token的关键词是yes/no/number/log/if/公式/set 进行不同的操作
     symbol = {
         '+': accounting,
         '-': accounting,
@@ -347,6 +356,7 @@ def apply_tokens(tokens):
         '>': compare,
         '<': compare
     }
+    global varis
     if tokens[0].type in [Type.yes, Type.no]:
         return tokens[0].type
     elif tokens[0].type == Type.number:
@@ -357,11 +367,13 @@ def apply_tokens(tokens):
     elif tokens[1].type == Type.choice:
         result = apply_if(tokens)
         return result
+    elif tokens[1].type == Type.set:
+        varis[tokens[2].value] = tokens[3].value
     else:
         return symbol[tokens[1].value](tokens[1:-1])
 
 
-def apply(code):
+def apply(code, varis):
     """
     code 是一个字符串
 
@@ -401,7 +413,8 @@ def apply(code):
     注意，变量是作为一种新的 token 而存在
     """
     code_tokens = json_tokens(code)
-    return apply_tokens(code_tokens)
+    log(code_tokens)
+    return apply_tokens(code_tokens, varis)
 
 
 def test_apply():
@@ -441,6 +454,14 @@ def test_apply():
     ensure(result7 == 3, 'testApply7')
 
 
+def test_set():
+    code = '''
+        [set a 1]
+        [set b 2]
+        [+ a b]
+        '''
+    log()
+
 def ensure(condition, message):
     if not condition:
         log('*** 测试失败:', message)
@@ -452,6 +473,7 @@ def log(*args):
 
 def main():
     test_apply()
+    test_set()
 
 
 if __name__ == '__main__':
