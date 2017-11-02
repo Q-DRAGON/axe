@@ -31,6 +31,7 @@ class Type(Enum):
     log = 23               # log
     choice = 24            # if
     set = 25               # set
+    var = 26               # variables
 
 
 class Token(object):
@@ -69,7 +70,7 @@ class Token(object):
         self.value = token_value
 
     def __repr__(self):
-        return '({})'.format(self.value)
+        return '({} {})\n'.format(self.value, self.type)
 
 
 def string_end(code, index):
@@ -149,10 +150,16 @@ def keyword_end(code, index):
 
 
 def weather_keyword_token(s):
-    # 判断字符串s是否是关键词，如果是关键词返回关键词token，否则返回字符串token
-    keywords = ['log', 'true', 'false', 'null', 'yes', 'no', 'if', 'set']
+    # 判断字符串s是否是关键词、变量、运算符，如果都不是，则返回字符串token
+    keywords = ['log', 'true', 'false',
+                'null', 'yes', 'no', 'if', 'set',
+                '+', '-', '*', '/', '%',
+                '=', '!', '>', '<']
     if s in keywords:
         t = Token(Type.auto, s)
+    elif s[0] != '"':
+        # 如果不是字符串，则定义为变量
+        t = Token(Type.var, s)
     else:
         t = Token(Type.string, s)
     return t
@@ -160,6 +167,7 @@ def weather_keyword_token(s):
 
 def json_tokens(code):
     # 把字符串转成tokens
+    # 待补充：存入变量类型
     length = len(code)
     tokens = []
     spaces = [' ', '\n', '\t']
@@ -169,18 +177,18 @@ def json_tokens(code):
     start = 0
     while i < length:
         c = code[i]
-        if c in '[]':
-            if start < i:
-                s = code[start: i]
-                t = weather_keyword_token(s)
-                tokens.append(t)
-                t = Token(Type.auto, c)
-                tokens.append(t)
-            else:
-                t = Token(Type.auto, c)
-                tokens.append(t)
-            i += 1
+        if c in digits:
+            # 处理数字, 现在不支持小数和负数
+            end = 0
+            for offset, char in enumerate(code[i:]):
+                if char not in digits:
+                    end = offset
+                    break
+            n = int(code[i - 1:i + end])
+            i += end
             start = i
+            t = Token(Type.number, n)
+            tokens.append(t)
         elif c == '"':
             # 处理字符串
             s, offset = string_end(code, i)
@@ -191,6 +199,19 @@ def json_tokens(code):
         elif c == ';':
             # 处理注释
             i = notes_tokens(code, i)
+            start = i
+        elif c in ['[', ']']:
+            # 左右括号加自己，加前面的字符串--如果有
+            if start < i:
+                s = code[start: i]
+                t = weather_keyword_token(s)
+                tokens.append(t)
+                t = Token(Type.auto, c)
+                tokens.append(t)
+            else:
+                t = Token(Type.auto, c)
+                tokens.append(t)
+            i += 1
             start = i
         elif c in spaces:
             # 处理空格、回车和tab键，跳过空白键并返回前面的关键词/字符串
@@ -204,67 +225,8 @@ def json_tokens(code):
             i += 1
     return tokens
 
-    # while i < length:
-    #     # 先看看当前应该处理啥
-    #     c = code[i]
-    #     i += 1
-    #     if c in spaces:
-    #         # 空白符号要跳过, space
-    #         continue
-    #     elif c in ':,{}[]+-*/%=!><':
-    #         # 处理 n 种单个符号
-    #         t = Token(Type.auto, c)
-    #         tokens.append(t)
-    #     elif c == '"':
-    #         # 处理字符串
-    #         s, offset = string_end(code, i)
-    #         i = offset + 1
-    #         t = Token(Type.string, s)
-    #         tokens.append(t)
-    #     elif c in digits:
-    #         # 处理数字, 现在不支持小数和负数
-    #         end = 0
-    #         for offset, char in enumerate(code[i:]):
-    #             if char not in digits:
-    #                 end = offset
-    #                 break
-    #         n = int(code[i - 1:i + end])
-    #         i += end
-    #         t = Token(Type.number, n)
-    #         # log('token', type(n))
-    #         tokens.append(t)
-    #     elif c in 'tfnylis':
-    #         # 处理关键词 true, false, null, yes, no, log
-    #         s, offset = keyword_end(code, i)
-    #         i = offset
-    #         if s == 'True':
-    #             t = Token(Type.true, s)
-    #         elif s == 'False':
-    #             t = Token(Type.false, s)
-    #         elif s == 'None':
-    #             t = Token(Type.null, s)
-    #         elif s == 'log':
-    #             t = Token(Type.log, s)
-    #         elif s == 'if':
-    #             t = Token(Type.choice, s)
-    #         elif s == 'yes':
-    #             t = Token(Type.yes, s)
-    #         elif s == 'no':
-    #             t = Token(Type.no, s)
-    #         elif s == 'set':
-    #             t = Token(Type.set, s)
-    #         if t is not None:
-    #             tokens.append(t)
-    #     elif c == ';':
-    #         # 处理注释
-    #         i = notes_tokens(code, i)
-    #     else:
-    #         # 出错了
-    #         pass
-    # return tokens
 
-
-def accounting(code):
+def accounting(code, vs):
     symbol = {
         '+': apply_sum,
         '-': apply_sub,
@@ -273,34 +235,23 @@ def accounting(code):
         '%': apply_mod,
     }
     function_name = symbol[code[0].value]
-    i = 2
     length = len(code)
-    result = code[1].value
+    if code[1].type == Type.var:
+        result = vs[code[1].value]
+    else:
+        result = code[1].value
+    i = 2
     while i < length:
-        if code[i].type == Type.number:
-            result = function_name(result, code[i].value)
-            i += 1
-        elif code[i].type == Type.bracketLeft:
-            count = 1
-            for index, j in enumerate(code[i + 1:]):
-                if j.type == Type.bracketLeft:
-                    count += 1
-                elif j.type == Type.bracketRight:
-                    count -= 1
-                    if count == 0:
-                        end = index
-                        result = function_name(result, apply_tokens(code[i: end + i + 2], variables))
-                        i += len(code[i: end + i + 2])
-                    else:
-                        pass
-                else:
-                    continue
-        else:
-            i += 1
+        if code[i].type == Type.var:
+            code[i].value = vs[code[i].value]
+            # result = function_name(result, code[i].value)
+        # elif code[i].type == Type.number:
+        result = function_name(result, code[i].value)
+        i += 1
     return result
 
 
-def compare(code):
+def compare(code, vs):
     symbol = {
         '=': apply_equal,
         '!': apply_not_equal,
@@ -387,13 +338,13 @@ def apply_if(tokens):
     statement_yes, yes_end = find_statement(tokens, condition_end + 1)
     statement_no, no_end = find_statement(tokens, yes_end + 1)
     if condition[0].type == Type.yes:
-        return apply_tokens(statement_yes, variables)
+        return apply_exp(statement_yes, variables)
     elif condition[0].type == Type.no:
-        return apply_tokens(statement_no, variables)
-    elif apply_tokens(condition, variables) == Type.yes:
-        return apply_tokens(statement_yes, variables)
+        return apply_exp(statement_no, variables)
+    elif apply_exp(condition, variables) == Type.yes:
+        return apply_exp(statement_yes, variables)
     else:
-        return apply_tokens(statement_no, variables)
+        return apply_exp(statement_no, variables)
 
 
 def pop_list(stack):
@@ -413,18 +364,18 @@ def parsed_ast(token_list):
     i = 0
     while i < len(token_list):
         token = token_list[i].value
-        log('token', token_list[i], token_list[i].type)
-        i += 1
         if token == ']':
             list_token = pop_list(l)
             l.append(list_token)
         else:
             l.append(token_list[i])
+        i += 1
     return l
 
 
 def apply_exp(exp, vs):
     # 根据token的关键词是log/if/公式/set 进行不同的操作
+    # 待完成：set引用的函数
     symbol = {
         '+': accounting,
         '-': accounting,
@@ -446,14 +397,14 @@ def apply_exp(exp, vs):
     elif exp[0].type == Type.set:
         vs[exp[1].value] = exp[2].value
     else:
-        return symbol[exp[0].value](exp)
+        return symbol[exp[0].value](exp, vs)
 
 
 def apply_ast(ast, vs):
     i = 0
     while i < len(ast) - 1:
-        i += 1
         apply_exp(ast[i], vs)
+        i += 1
     return apply_exp(ast[i], vs)
 
 
@@ -497,9 +448,7 @@ def apply(code, vs):
     注意，变量是作为一种新的 token 而存在
     """
     code_tokens = json_tokens(code)
-    log('tokens', code, code_tokens)
-    ast = ast_from_tokens(code_tokens)
-    log('ast', ast)
+    ast = parsed_ast(code_tokens)
     return apply_ast(ast, vs)
 
 
@@ -541,14 +490,32 @@ def test_apply():
 
 
 def test_set():
-    code = '''
-        [set a 1]
-        [set b 2]
-        [+ a b]
-        '''
+    code1 = '''
+[set a 1]
+[set b 2]
+[+ a b]
+'''
+    ensure(apply(code1, variables) == 3, 'test_set 1 failed')
 
-    log(json_tokens(code))
-    log(parsed_ast(json_tokens(code)))
+    code2 = '[* 2 3 4] ; 表达式的值是 24'
+    ensure(apply(code2, variables) == 24, 'test_set 2 failed')
+
+    # code3 = '[- 1 [+ 2 3] [+ 1 1]]'
+    # ensure(apply(code3, variables) == -6, 'test_set 3 failed')
+
+    # code4 = '[log "hello"]   ; 输出 hello, 表达式的值是 null(关键字 表示空)'
+    # apply(code4, variables)
+
+    string6 = '''[if yes
+        [log "成功"]
+        [log "没成功"]
+    ]'''
+    result6 = apply(string6, variables)
+    ensure(result6 == Type.null, 'testApply6')
+
+    string7 = '''[if [> 2 1] 3 4]'''
+    result7 = apply(string7, variables)
+    ensure(result7 == 3, 'testApply7')
 
 
 def ensure(condition, message):
