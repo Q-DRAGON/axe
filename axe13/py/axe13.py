@@ -70,7 +70,7 @@ class Token(object):
         self.value = token_value
 
     def __repr__(self):
-        return '({} {})\n'.format(self.value, self.type)
+        return '({})'.format(self.value)
 
 
 def string_end(code, index):
@@ -117,38 +117,6 @@ def notes_tokens(code, index):
     return offset
 
 
-def keyword_end(code, index):
-    # 判断关键词并返回关键字和结束的坐标
-    offset = index
-    if code[offset - 1: offset + 3] == 'true':
-        offset += 3
-        return 'True', offset
-    elif code[offset - 1: offset + 4] == 'false':
-        offset += 4
-        return 'False', offset
-    elif code[offset - 1: offset + 3] == 'null':
-        offset += 3
-        return 'None', offset
-    elif code[offset - 1: offset + 2] == 'log':
-        offset += 2
-        return 'log', offset
-    elif code[offset - 1: offset + 1] == 'if':
-        offset += 1
-        return 'if', offset
-    elif code[offset - 1: offset + 2] == 'yes':
-        offset += 2
-        return 'yes', offset
-    elif code[offset - 1: offset + 1] == 'no':
-        offset += 1
-        return 'no', offset
-    elif code[offset - 1: offset + 2] == 'set':
-        offset += 2
-        return 'set', offset
-    else:
-        # 错误字符则程序报错
-        pass
-
-
 def weather_keyword_token(s):
     # 判断字符串s是否是关键词、变量、运算符，如果都不是，则返回字符串token
     keywords = ['log', 'true', 'false',
@@ -167,7 +135,6 @@ def weather_keyword_token(s):
 
 def json_tokens(code):
     # 把字符串转成tokens
-    # 待补充：存入变量类型
     length = len(code)
     tokens = []
     spaces = [' ', '\n', '\t']
@@ -226,130 +193,9 @@ def json_tokens(code):
     return tokens
 
 
-def accounting(code, vs):
-    symbol = {
-        '+': apply_sum,
-        '-': apply_sub,
-        '*': apply_mul,
-        '/': apply_div,
-        '%': apply_mod,
-    }
-    function_name = symbol[code[0].value]
-    length = len(code)
-    if code[1].type == Type.var:
-        result = vs[code[1].value]
-    else:
-        result = code[1].value
-    i = 2
-    while i < length:
-        if code[i].type == Type.var:
-            code[i].value = vs[code[i].value]
-            # result = function_name(result, code[i].value)
-        # elif code[i].type == Type.number:
-        result = function_name(result, code[i].value)
-        i += 1
-    return result
-
-
-def compare(code, vs):
-    symbol = {
-        '=': apply_equal,
-        '!': apply_not_equal,
-        '>': apply_more,
-        '<': apply_less
-    }
-    function_name = symbol[code[0].value]
-    if function_name(code) is True:
-        return Type.yes
-    else:
-        return Type.no
-
-
-def apply_sum(a, b):
-    return a + b
-
-
-def apply_sub(a, b):
-    return a - b
-
-
-def apply_mul(a, b):
-    return a * b
-
-
-def apply_div(a, b):
-    return a / b
-
-
-def apply_mod(a, b):
-    return a % b
-
-
-def apply_equal(code):
-    return code[1].value == code[2].value
-
-
-def apply_not_equal(code):
-    return code[1].value != code[2].value
-
-
-def apply_more(code):
-    return code[1].value > code[2].value
-
-
-def apply_less(code):
-    return code[1].value < code[2].value
-
-
-def find_statement(tokens, start_index):
-    count = 0
-    j = start_index
-    end = start_index
-    statement = []
-    if tokens[j].type == Type.bracketLeft:
-        count += 1
-        j += 1
-        while j < len(tokens):
-            if tokens[j].type == Type.bracketRight:
-                count -= 1
-                if count == 0:
-                    statement = tokens[start_index: j + 1]
-                    end = j
-                    break
-                else:
-                    j += 1
-            else:
-                j += 1
-    else:
-        statement.append(tokens[j])
-        end = j
-    return statement, end
-
-
-def apply_log(tokens):
-    i = 2
-    while i < len(tokens) - 1:
-        print(tokens[i].value)
-        i += 1
-
-
-def apply_if(tokens):
-    condition, condition_end = find_statement(tokens, 2)
-    statement_yes, yes_end = find_statement(tokens, condition_end + 1)
-    statement_no, no_end = find_statement(tokens, yes_end + 1)
-    if condition[0].type == Type.yes:
-        return apply_exp(statement_yes, variables)
-    elif condition[0].type == Type.no:
-        return apply_exp(statement_no, variables)
-    elif apply_exp(condition, variables) == Type.yes:
-        return apply_exp(statement_yes, variables)
-    else:
-        return apply_exp(statement_no, variables)
-
-
 def pop_list(stack):
     l = []
-    while stack[-1].value != '[':
+    while isinstance(stack[-1], list) or stack[-1].value != '[':
         l.append(stack.pop(-1))
     stack.pop(-1)
     l.reverse()
@@ -373,6 +219,104 @@ def parsed_ast(token_list):
     return l
 
 
+def accounting(code, vs):
+    symbol = {
+        '+': apply_sum,
+        '-': apply_sub,
+        '*': apply_mul,
+        '/': apply_div,
+        '%': apply_mod,
+    }
+    l = []
+    for i in code:
+        if isinstance(i, list):
+            i = apply_exp(i, vs)
+        elif isinstance(i, Token) and i.type == Type.var:
+            i = vs[i.value]
+        elif isinstance(i, Token) and i.type == Type.number:
+            i = i.value
+        l.append(i)
+    function_name = symbol[l[0].value]
+    return function_name(l[1:])
+
+
+def compare(code, vs):
+    symbol = {
+        '=': apply_equal,
+        '!': apply_not_equal,
+        '>': apply_more,
+        '<': apply_less
+    }
+    function_name = symbol[code[0].value]
+    if function_name(code) is True:
+        return 'yes'
+    else:
+        return 'no'
+
+
+def apply_sum(l):
+    return sum(l)
+
+
+def apply_sub(l):
+    return l[0] - sum(l[1:])
+
+
+def apply_mul(l):
+    from functools import reduce
+    return reduce(lambda a, b: a * b, l)
+
+
+def apply_div(l):
+    return l[0] / apply_mul(l[1:])
+
+
+def apply_mod(l):
+    return l[0] % l[1]
+
+
+def apply_equal(code):
+    return code[1].value == code[2].value
+
+
+def apply_not_equal(code):
+    return code[1].value != code[2].value
+
+
+def apply_more(code):
+    return code[1].value > code[2].value
+
+
+def apply_less(code):
+    return code[1].value < code[2].value
+
+
+def apply_log(tokens):
+    i = 1
+    while i < len(tokens):
+        print(tokens[i].value)
+        i += 1
+
+
+def return_exp(exp, vs):
+    # 如果expression是字符则返回自己的值,如果是list则解析
+    if isinstance(exp, list):
+        exp = apply_exp(exp, vs)
+    else:
+        exp = exp.value
+    return exp
+
+
+def apply_if(exp, vs):
+    condition = return_exp(exp[1], vs)
+    if condition == 'yes':
+        return return_exp(exp[2], vs)
+    elif condition == 'no':
+        return return_exp(exp[3], vs)
+    else:
+        print('判断语句有误')
+
+
 def apply_exp(exp, vs):
     # 根据token的关键词是log/if/公式/set 进行不同的操作
     # 待完成：set引用的函数
@@ -387,12 +331,11 @@ def apply_exp(exp, vs):
         '>': compare,
         '<': compare
     }
-
     if exp[0].type == Type.log:
         apply_log(exp)
-        # return Type.null
+        return Type.null
     elif exp[0].type == Type.choice:
-        result = apply_if(exp)
+        result = apply_if(exp, vs)
         return result
     elif exp[0].type == Type.set:
         vs[exp[1].value] = exp[2].value
@@ -409,113 +352,40 @@ def apply_ast(ast, vs):
 
 
 def apply(code, vs):
-    """
-    code 是一个字符串
-
-    0, 每个表达式都是一个值, 操作符(可以认为是函数)和操作数(可以认为是参数)用空格隔开
-    1, ; 到行末是单行注释, 没有多行注释
-    2, 支持 + - * / % 五种基本数学操作和 = ! > < 四种逻辑操作(相等 不等 大于 小于)
-        逻辑操作的结果是布尔值 yes 和 no(这 2 个是关键字)
-    3, 支持表达式嵌套
-    4, 支持内置函数 log, 作用是输出参数字符串
-    5, 支持条件表达式 if
-
-    [+ 1 2]         ; 表达式的值是 3
-    [* 2 3 4]       ; 表达式的值是 24
-    [log "hello"]   ; 输出 hello, 表达式的值是 null(关键字 表示空)
-    [+ 1 [- 2 3]]   ; 表达式的值是 0, 相当于普通语法的 1 + (2 - 3)
-    [if [> 2 1] 3 4]; 表达式的值是 3
-    [if yes
-        [log "成功"]
-        [log "没成功"]
-    ]
-    """
-    """
-    code 是代码字符串，支持定义变量的功能
-    code = '''
-        [set a 1]
-        [set b 2]
-        [+ a b]
-        '''
-    上面三行代码用 set 操作实现了变量定义
-
-    本函数中，vars 是一个字典，包含了所有当前环境中定义的变量和值
-    用这样的方式，在全局环境中声明一个 {}
-    每个 apply 都传入 vars
-    在 set 的时候往里面添加变量和值
-    在使用到变量的时候，从 vars 中找变量的值，找不到就是未定义变量
-
-    注意，变量是作为一种新的 token 而存在
-    """
+    # apply字符串
     code_tokens = json_tokens(code)
     ast = parsed_ast(code_tokens)
     return apply_ast(ast, vs)
-
-
-def test_apply():
-    string1 = r'''
-[+         ;vuui
-1 2 "qwe"
-]
-'''
-    result1 = apply(string1, variables)
-    ensure(result1 == 3, 'testApply1')
-
-    string2 = '[< 10 3]'
-    result2 = apply(string2, variables)
-    ensure(result2 == Type.no, 'testApply2')
-
-    string3 = '[* 2 3 4] ; 表达式的值是 24'
-    result3 = apply(string3, variables)
-    ensure(result3 == 24, 'testApply3')
-
-    string4 = '[- 1 [+ 2 3] [+ 1 1]]'
-    result4 = apply(string4, variables)
-    ensure(result4 == -6, 'testApply4')
-
-    string5 = '[log "hello"]   ; 输出 hello, 表达式的值是 null(关键字 表示空)'
-    result5 = apply(string5, variables)
-    ensure(result5 == Type.null, 'testApply5')
-
-    string6 = '''[if yes
-        [log "成功"]
-        [log "没成功"]
-    ]'''
-    result6 = apply(string6, variables)
-    ensure(result6 == Type.null, 'testApply6')
-
-    string7 = '''[if [> 2 1] 3 4]'''
-    result7 = apply(string7, variables)
-    ensure(result7 == 3, 'testApply7')
 
 
 def test_set():
     code1 = '''
 [set a 1]
 [set b 2]
-[+ a b]
+[* a b]
 '''
-    ensure(apply(code1, variables) == 3, 'test_set 1 failed')
+    ensure(apply(code1, variables) == 2, 'test_set 1 failed')
 
     code2 = '[* 2 3 4] ; 表达式的值是 24'
     ensure(apply(code2, variables) == 24, 'test_set 2 failed')
 
-    # code3 = '[- 1 [+ 2 3] [+ 1 1]]'
-    # ensure(apply(code3, variables) == -6, 'test_set 3 failed')
+    code3 = '[- 1 [+ 2 3] [+ 1 1]]'
+    ensure(apply(code3, variables) == -6, 'test_set 3 failed')
 
-    # code4 = '[log "hello"]   ; 输出 hello, 表达式的值是 null(关键字 表示空)'
-    # apply(code4, variables)
+    code4 = '[log "hello"]   ; 输出 hello, 表达式的值是 null(关键字 表示空)'
+    ensure(apply(code4, variables) == Type.null, 'test_set 4 failed')
 
-    string6 = '''[if yes
+    code5 = '''[if yes
         [log "成功"]
         [log "没成功"]
     ]'''
-    result6 = apply(string6, variables)
-    ensure(result6 == Type.null, 'testApply6')
+    ensure(apply(code5, variables) == Type.null, 'test_set 5 failed')
 
-    string7 = '''[if [> 2 1] 3 4]'''
-    result7 = apply(string7, variables)
-    ensure(result7 == 3, 'testApply7')
+    code6 = '''[if [> 2 1] 3 4]'''
+    ensure(apply(code6, variables) == 3, 'test_set 6 failed')
+
+    code7 = '[< 10 3]'
+    ensure(apply(code7, variables) == 'no', 'test_set 7 failed')
 
 
 def ensure(condition, message):
@@ -528,7 +398,6 @@ def log(*args):
 
 
 def main():
-    # test_apply()
     test_set()
 
 
