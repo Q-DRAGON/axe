@@ -5,7 +5,7 @@ variables = {}
 
 
 class Type(Enum):
-    auto = 0  # auto 就是 6 个单字符符号, 用来方便写代码的
+    auto = 0  # auto 就是 n 个特定字符符号, 用来方便写代码的
     colon = 1              # :
     comma = 2              # ,
     braceLeft = 3          # {
@@ -17,20 +17,20 @@ class Type(Enum):
     true = 9               # true
     false = 10             # false
     null = 11              # null
-    yes = 12
-    no = 13
-    add = 14
-    sub = 15
-    mul = 16
-    div = 17
-    mod = 18
-    equ = 19
-    noequ = 20
-    more = 21
-    less = 22
-    log = 23
-    choice = 24
-    set = 25
+    yes = 12               # yes
+    no = 13                # no
+    add = 14               # +
+    sub = 15               # -
+    mul = 16               # *
+    div = 17               # /
+    mod = 18               # %
+    equ = 19               # ==
+    noequ = 20             # !=
+    more = 21              # >
+    less = 22              # <
+    log = 23               # log
+    choice = 24            # if
+    set = 25               # set
 
 
 class Token(object):
@@ -53,7 +53,14 @@ class Token(object):
             '!': Type.noequ,
             '>': Type.more,
             '<': Type.less,
-            'log': Type.log
+            'log': Type.log,
+            'true': Type.true,
+            'false': Type.false,
+            'null': Type.null,
+            'yes': Type.yes,
+            'no': Type.no,
+            'if': Type.choice,
+            'set': Type.set
         }
         if token_type == Type.auto:
             self.type = d[token_value]
@@ -66,17 +73,13 @@ class Token(object):
 
 
 def string_end(code, index):
-    """
-    code = "abc"
-    index = 1
-    """
+    # 寻找字符串的结尾，并返回字符串和结束字符的下标
     s = ''
     offset = index + 1
-    log('code', code, index)
     while offset < len(code):
         c = code[offset]
         if c == '"':
-            # 找到了字符串的结尾
+            # 找到了字符串的结尾，返回不带引号的字符串
             s = code[index + 1: offset]
             return s, offset
         elif c == '\\':
@@ -102,7 +105,7 @@ def string_end(code, index):
 
 
 def notes_tokens(code, index):
-    # 寻找注释的结尾
+    # 寻找注释的结尾的下一个字符的脚标
     offset = index
     while offset < len(code):
         if code[offset] != '\n':
@@ -145,7 +148,18 @@ def keyword_end(code, index):
         pass
 
 
+def weather_keyword_token(s):
+    # 判断字符串s是否是关键词，如果是关键词返回关键词token，否则返回字符串token
+    keywords = ['log', 'true', 'false', 'null', 'yes', 'no', 'if', 'set']
+    if s in keywords:
+        t = Token(Type.auto, s)
+    else:
+        t = Token(Type.string, s)
+    return t
+
+
 def json_tokens(code):
+    # 把字符串转成tokens
     length = len(code)
     tokens = []
     spaces = [' ', '\n', '\t']
@@ -155,10 +169,16 @@ def json_tokens(code):
     start = 0
     while i < length:
         c = code[i]
-        if c in ['[', ']']:
+        if c in '[]':
             if start < i:
-                tokens.append(code[start: i])
-            tokens.append(c)
+                s = code[start: i]
+                t = weather_keyword_token(s)
+                tokens.append(t)
+                t = Token(Type.auto, c)
+                tokens.append(t)
+            else:
+                t = Token(Type.auto, c)
+                tokens.append(t)
             i += 1
             start = i
         elif c == '"':
@@ -173,8 +193,11 @@ def json_tokens(code):
             i = notes_tokens(code, i)
             start = i
         elif c in spaces:
+            # 处理空格、回车和tab键，跳过空白键并返回前面的关键词/字符串
             if start < i:
-                tokens.append(code[start: i])
+                s = code[start: i]
+                t = weather_keyword_token(s)
+                tokens.append(t)
             i += 1
             start = i
         else:
@@ -375,7 +398,7 @@ def apply_if(tokens):
 
 def pop_list(stack):
     l = []
-    while stack[-1] != '[':
+    while stack[-1].value != '[':
         l.append(stack.pop(-1))
     stack.pop(-1)
     l.reverse()
@@ -389,13 +412,14 @@ def parsed_ast(token_list):
     l = []
     i = 0
     while i < len(token_list):
-        token = token_list[i]
+        token = token_list[i].value
+        log('token', token_list[i], token_list[i].type)
         i += 1
         if token == ']':
             list_token = pop_list(l)
             l.append(list_token)
         else:
-            l.append(token)
+            l.append(token_list[i])
     return l
 
 
@@ -522,11 +546,8 @@ def test_set():
         [set b 2]
         [+ a b]
         '''
-    # log(apply(code, variables))
-    string1 = r'''
-[- 1 [+ 2 3] [+ 1 1]]'''
-    log(json_tokens(code))
 
+    log(json_tokens(code))
     log(parsed_ast(json_tokens(code)))
 
 
