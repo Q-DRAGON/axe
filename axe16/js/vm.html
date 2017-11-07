@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>axe16</title>
+        <style>
+            canvas {
+                outline: 1px dashed lightskyblue;
+            }
+        </style>
+        <!-- 引入所有用到的文件 -->
+        <script src='vm.js'></script>
+    </head>
+    <body>
+        <canvas id="id-canvas" width="10" height="10"></canvas>
+    <script>
+    // 函数名应该用 const 修饰, 这样不会被意外修改
+    const __main = function() {
+        run(memory)
+    }
+    __main()
+    </script>
+    </body>
+</html>
