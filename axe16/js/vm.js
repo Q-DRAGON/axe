@@ -13,13 +13,31 @@ const memory = ['00000000', '00010000', '00000001', '00000000', '00100000', '000
 // '''
 // parseInt(memory[0],2)
 const d = {
-    'x': 0b00010000,
-    'y': 0b00100000,
-    'z': 0b00110000,
-    'set': 0b00000000,
-    'load': 0b00000001,
-    'add': 0b00000010,
-    'save': 0b00000011
+    '0b00010000': function(i){
+        if (i == undefined) {
+            return x
+        }else {
+            x = i
+        }
+    },
+    '0b00100000': function(i){
+        if (i == undefined) {
+            return y
+        }else {
+            y = i
+        }
+    },
+    '0b00110000': function(i){
+        if (i == undefined) {
+            return z
+        }else {
+            z = i
+        }
+    },
+    '0b00000000': 'set',
+    '0b00000001': 'load',
+    '0b00000010': 'add',
+    '0b00000011': 'save'
 }
 
 const log = console.log.bind(console)
@@ -66,24 +84,43 @@ const run = function(memory) {
     */
     log(memory)
     while (pc < memory.length) {
-        let inner_pc = parseInt(memory[pc],2)
-        if (inner_pc == 0b00000000) {
+        // let inner_pc = parseInt(memory[pc],2)
+        if (inner_pc == '0b00000000') {
             set(memory[pc + 1], memory[pc + 2])
-        }else if (inner_pc == 0b00000001) {
-            set(memory[pc + 1], memory[pc + 2])
+        }else if (inner_pc == '0b00000001') {
+            load(memory[pc + 1], memory[pc + 2])
+        }else if (inner_pc == '0b00000011') {
+            save(memory[pc + 1], memory[pc + 2])
+        }else if (inner_pc == '0b00000010') {
+            add(memory[pc + 1], memory[pc + 2],  memory[pc + 3])
         }
     }
     log(memory)
 }
 
-const set = function(y, z){
-
+const set = function(variable, value){
+    d[variable](value)
     pc += 3
 }
 
-const load = function(y, z){
-
+const load = function(m, variable){
+    index = int(m[1:])
+    value = memory[index]
+    d[variable](value)
     pc += 3
+}
+
+const save = function(variable, m){
+    index = int(m[1:])
+    memory[index] = d[variable]
+    pc += 3
+}
+
+const add = function(x1, x2, x3){
+    x1 = d[x1]
+    x2 = d[x2]
+    d[x3](x1 + x2)
+    pc += 4
 }
 // // 2，实现下面的功能
 // 让上面的虚拟机程序支持显示屏， 显示屏的像素是 10 x10
