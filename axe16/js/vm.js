@@ -11,36 +11,37 @@ const memory = ['00000000', '00010000', '00000001', '00000000', '00100000', '000
 // add x y z
 // save z @2
 // '''
-// parseInt(memory[0],2)
 const d = {
-    '0b00010000': function(i){
+    '00010000': function(i){
         if (i == undefined) {
             return x
         }else {
             x = i
         }
     },
-    '0b00100000': function(i){
+    '00100000': function(i){
         if (i == undefined) {
             return y
         }else {
             y = i
         }
     },
-    '0b00110000': function(i){
+    '00110000': function(i){
         if (i == undefined) {
             return z
         }else {
             z = i
         }
     },
-    '0b00000000': 'set',
-    '0b00000001': 'load',
-    '0b00000010': 'add',
-    '0b00000011': 'save'
+    '00000000': 'set',
+    '00000001': 'load',
+    '00000010': 'add',
+    '00000011': 'save'
 }
 
 const log = console.log.bind(console)
+
+const _e = (sel) => document.querySelector(sel)
 
 // 假设 GuaPU 有 5 个寄存器, 分别用如下的数字表示
 // 00000000    ; pc(program counter) 当前指令寄存器
@@ -82,20 +83,23 @@ const run = function(memory) {
     注意，memory 目前只能支持 256 字节
     因为 pc 寄存器只有 8 位（1 字节）
     */
-    log(memory)
+    log('old memory', memory)
     while (pc < memory.length) {
         // let inner_pc = parseInt(memory[pc],2)
-        if (inner_pc == '0b00000000') {
+        if (memory[pc] == '00000000') {
             set(memory[pc + 1], memory[pc + 2])
-        }else if (inner_pc == '0b00000001') {
+        }else if (memory[pc] == '00000001') {
             load(memory[pc + 1], memory[pc + 2])
-        }else if (inner_pc == '0b00000011') {
+        }else if (memory[pc] == '00000011') {
             save(memory[pc + 1], memory[pc + 2])
-        }else if (inner_pc == '0b00000010') {
+        }else if (memory[pc] == '00000010') {
             add(memory[pc + 1], memory[pc + 2],  memory[pc + 3])
         }
     }
-    log(memory)
+    log('new memory', memory)
+    log('x = ', x)
+    log('y = ', y)
+    log('z = ', z)
 }
 
 const set = function(variable, value){
@@ -104,23 +108,35 @@ const set = function(variable, value){
 }
 
 const load = function(m, variable){
-    index = int(m[1:])
-    value = memory[index]
+    let index = parseInt(m, 2)
+    let value = memory[index]
     d[variable](value)
     pc += 3
 }
 
 const save = function(variable, m){
-    index = int(m[1:])
-    memory[index] = d[variable]
+    let index = parseInt(m, 2)
+    memory[index] = d[variable]()
     pc += 3
 }
 
 const add = function(x1, x2, x3){
-    x1 = d[x1]
-    x2 = d[x2]
-    d[x3](x1 + x2)
+    let a = parseInt(d[x1](), 2)
+    let b = parseInt(d[x2](), 2)
+    let sum = a + b
+    d[x3](trans_to_string(sum.toString(2)))
     pc += 4
+}
+
+const trans_to_string = function(value){
+    let s = ''
+    if (value.length <= 8) {
+        for (var i = 0; i < 8 - value.length; i++) {
+            s += '0'
+        }
+        s += value
+    }
+    return s
 }
 // // 2，实现下面的功能
 // 让上面的虚拟机程序支持显示屏， 显示屏的像素是 10 x10
@@ -128,3 +144,38 @@ const add = function(x1, x2, x3){
 // 每个像素可表示 255 个颜色
 //
 // 用一个 10 x10 的 canvas 来模拟这个显示屏
+
+const randomlist = function(){
+    let list = []
+    for (var i = 0; i < 256; i++) {
+        let x = Math.random() * 256
+        let a = trans_to_string(Math.floor(x).toString(2))
+        // log('test', a, x)
+        list.push(a)
+    }
+    return list
+}
+
+const colorscreen = function(){
+    let list = randomlist()
+    list = list.slice(-100,)
+    // log(list)
+
+    let canvas = _e('#id-canvas')
+    let context = canvas.getContext('2d')
+    let pixels = context.getImageData(0, 0, 10, 10)
+    let data = pixels.data
+    for (var i = 0; i < 400; i += 4) {
+        [r, g, b, a] = data.slice(i, i + 4)
+        r = parseInt(list[i / 4].slice(0, 2), 2) * 64
+        g = parseInt(list[i / 4].slice(2, 4), 2) * 64
+        b = parseInt(list[i / 4].slice(4, 6), 2) * 64
+        a = parseInt(list[i / 4].slice(6, 8), 2) * 64
+        data[i] = r
+        data[i + 1] = g
+        data[i + 2] = b
+        data[i + 3] = a
+    }
+    // log(data)
+    context.putImageData(pixels, 0, 0)
+}
