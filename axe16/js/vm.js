@@ -67,7 +67,7 @@ const run = function(memory) {
 // 用一个 10 x10 的 canvas 来模拟这个显示屏
 
 const colorscreen = function(memory){
-    let list = memory.slice(155,)
+    let list = memory.slice(-100,)
     log('list', list)
     let canvas = _e('#id-canvas')
     let context = canvas.getContext('2d')
