@@ -1,48 +1,3 @@
-// 1，实现下面的函数
-const memory = ['00000000', '00010000', '00000001', '00000000', '00100000', '00000010', '00000011', '00010000', '00000000', '00000011', '00100000', '00000001', '00000001', '00000000', '00010000', '00000001', '00000001', '00100000', '00000010', '00010000', '00100000', '00110000', '00000011', '00110000', '00000010']
-
-// string = '''
-// set x 1
-// set y 2
-// save x @0
-// save y @1
-// load @0 x
-// load @1 y
-// add x y z
-// save z @2
-// '''
-const d = {
-    '00010000': function(i){
-        if (i == undefined) {
-            return x
-        }else {
-            x = i
-        }
-    },
-    '00100000': function(i){
-        if (i == undefined) {
-            return y
-        }else {
-            y = i
-        }
-    },
-    '00110000': function(i){
-        if (i == undefined) {
-            return z
-        }else {
-            z = i
-        }
-    },
-    '00000000': 'set',
-    '00000001': 'load',
-    '00000010': 'add',
-    '00000011': 'save'
-}
-
-const log = console.log.bind(console)
-
-const _e = (sel) => document.querySelector(sel)
-
 // 假设 GuaPU 有 5 个寄存器, 分别用如下的数字表示
 // 00000000    ; pc(program counter) 当前指令寄存器
 // 00010000    ; x
@@ -83,61 +38,27 @@ const run = function(memory) {
     注意，memory 目前只能支持 256 字节
     因为 pc 寄存器只有 8 位（1 字节）
     */
-    log('old memory', memory)
+    enhance_memory(memory, 256)
     while (pc < memory.length) {
         // let inner_pc = parseInt(memory[pc],2)
-        if (memory[pc] == '00000000') {
-            set(memory[pc + 1], memory[pc + 2])
-        }else if (memory[pc] == '00000001') {
-            load(memory[pc + 1], memory[pc + 2])
-        }else if (memory[pc] == '00000011') {
-            save(memory[pc + 1], memory[pc + 2])
-        }else if (memory[pc] == '00000010') {
-            add(memory[pc + 1], memory[pc + 2],  memory[pc + 3])
-        }
+        func_d[memory[pc]](memory)
+        // if (memory[pc] == 0b00000000) {
+        //     set(memory[pc + 1], memory[pc + 2])
+        // }else if (memory[pc] == 0b00000001) {
+        //     load(memory[pc + 1], memory[pc + 2])
+        // }else if (memory[pc] == 0b00000011) {
+        //     save(memory[pc + 1], memory[pc + 2])
+        // }else if (memory[pc] == 0b00000010) {
+        //     add(memory[pc + 1], memory[pc + 2],  memory[pc + 3])
+        // }else if (memory[pc] == 0b00000010) {
+        //     add(memory[pc + 1], memory[pc + 2],  memory[pc + 3])
+        // }
     }
+    log('old memory', memory)
+    colorscreen(memory)
     log('new memory', memory)
-    log('x = ', x)
-    log('y = ', y)
-    log('z = ', z)
 }
 
-const set = function(variable, value){
-    d[variable](value)
-    pc += 3
-}
-
-const load = function(m, variable){
-    let index = parseInt(m, 2)
-    let value = memory[index]
-    d[variable](value)
-    pc += 3
-}
-
-const save = function(variable, m){
-    let index = parseInt(m, 2)
-    memory[index] = d[variable]()
-    pc += 3
-}
-
-const add = function(x1, x2, x3){
-    let a = parseInt(d[x1](), 2)
-    let b = parseInt(d[x2](), 2)
-    let sum = a + b
-    d[x3](trans_to_string(sum.toString(2)))
-    pc += 4
-}
-
-const trans_to_string = function(value){
-    let s = ''
-    if (value.length <= 8) {
-        for (var i = 0; i < 8 - value.length; i++) {
-            s += '0'
-        }
-        s += value
-    }
-    return s
-}
 // // 2，实现下面的功能
 // 让上面的虚拟机程序支持显示屏， 显示屏的像素是 10 x10
 // 因此内存的最后 100 个字节用于表示屏幕上的内容， 每个字节表示一个像素， 从左到右从上到下
@@ -145,36 +66,24 @@ const trans_to_string = function(value){
 //
 // 用一个 10 x10 的 canvas 来模拟这个显示屏
 
-const randomlist = function(){
-    let list = []
-    for (var i = 0; i < 256; i++) {
-        let x = Math.random() * 256
-        let a = trans_to_string(Math.floor(x).toString(2))
-        // log('test', a, x)
-        list.push(a)
-    }
-    return list
-}
-
-const colorscreen = function(){
-    let list = randomlist()
-    list = list.slice(-100,)
-    // log(list)
-
+const colorscreen = function(memory){
+    let list = memory.slice(155,)
+    log('list', list)
     let canvas = _e('#id-canvas')
     let context = canvas.getContext('2d')
     let pixels = context.getImageData(0, 0, 10, 10)
     let data = pixels.data
     for (var i = 0; i < 400; i += 4) {
-        [r, g, b, a] = data.slice(i, i + 4)
-        r = parseInt(list[i / 4].slice(0, 2), 2) * 64
-        g = parseInt(list[i / 4].slice(2, 4), 2) * 64
-        b = parseInt(list[i / 4].slice(4, 6), 2) * 64
-        a = parseInt(list[i / 4].slice(6, 8), 2) * 64
+        // [r, g, b, a] = data.slice(i, i + 4)
+        r = trans_to_RGBA(list[i / 4], 0, 2)
+        g = trans_to_RGBA(list[i / 4], 2, 4)
+        b = trans_to_RGBA(list[i / 4], 4, 6)
+        a = trans_to_RGBA(list[i / 4], 6, 8)
         data[i] = r
         data[i + 1] = g
         data[i + 2] = b
         data[i + 3] = a
+        // log('rgba', r, g, b, a)
     }
     // log(data)
     context.putImageData(pixels, 0, 0)
