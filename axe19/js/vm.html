@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>axe16</title>
+        <style>
+            canvas {
+                outline: 1px dashed lightskyblue;
+            }
+        </style>
+        <!-- 引入所有用到的文件 -->
+        <script src='utils.js'></script>
+        <!-- <script src='memory.js'></script> -->
+        <script src='functions.js'></script>
+        <script src='vm.js'></script>
+        <script src='dictionary.js'></script>
+        <script src='asm/asm_dic.js'></script>
+        <script src='asm.js'></script>
+    </head>
+    <body>
+        <canvas id="id-canvas" width="32" height="16"></canvas>
+    <script>
+    // 函数名应该用 const 修饰, 这样不会被意外修改
+    const __main = function() {
+        var memory = assembler(asm_code)
+        run(memory)
+    }
+    __main()
+    </script>
+    </body>
+</html>
