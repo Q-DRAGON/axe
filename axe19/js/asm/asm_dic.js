@@ -3,82 +3,123 @@ const asm_d = {
     'x': 0b0000000100000000,
     'y': 0b0000001000000000,
     'z': 0b0000001100000000,
+    'w': 0b1000001100000000,
     'c1': 0b0000010000000000,
     'f': 0b0000010100000000,
+    'r': 0b0000001110000000,
     'count1': 0b1111111111111011,
     'count2': 0b1111111111110111,
     'count3': 0b1111111111101111,
     'set': 0b0000000000000000,
     'load': 0b0000000100000000,
     'add': 0b0000001000000000,
+    'multiply': 0b0000100000000000,
+    'mod_2': 0b0001000000000000,
+    'divide': 0b0010000000000000,
     'save': 0b0000001100000000,
     'compare': 0b0000010000000000,
     'jump': 0b0000010100000000,
     'jump_when_less': 0b0000011000000000,
     'save_from_register': 0b0000011100000000,
+    'load_from_register': 0b0000100100000000,
     'stop': 0b1111111111111111,
     'start_of_command': 0b1111111111111110,
     'draw_char': 0b1111111111111101,
 }
 
-// const asm_code = `
-// set y 55536                ; 左上角第一个像素
-// set z 404                  ; 用于斜方向设置像素，每两排设置一个
-// set x 61455                ; 红色
-// save_from_register x y     ; 设置像素点
-// add y z y
-// save_from_register x y     ; 设置像素点
-// add y z y
-// save_from_register x y     ; 设置像素点
-// add y z y
-// save_from_register x y     ; 设置像素点
-// add y z y
-// save_from_register x y     ; 设置像素点
-// stop                       ; 停止
-// `
-
 const asm_code = `
 jump @1024
-0b0000000000100000  ;.
+0b0000000000100000
 0b0000000000000000
-0b1000000001100000  ;,
+0b1000000001100000
 0b0000000000000000
-0b0101110011010110  ;$
+0b0101110011010110
 0b0111010000000000
-0b0001011011111100  ;￥
+0b0001011011111100
 0b0001011000000000
-0b1111111010000010  ;0
+0b1111111010000010
 0b1111111000000000
-0b1000010011111110  ;1
+0b1000010011111110
 0b1000000000000000
-0b1111001010010010  ;2
+0b1111001010010010
 0b1001111000000000
-0b1001001010010010  ;3
+0b1001001010010010
 0b1111111000000000
-0b0001111000010000  ;4
+0b0001111000010000
 0b1111111000000000
-0b1001111010010010  ;5
+0b1001111010010010
 0b1111001000000000
-0b1111111010010010  ;6
+0b1111111010010010
 0b1111001000000000
-0b0000001000000010  ;7
+0b0000001000000010
 0b1111111000000000
-0b1111111010010010  ;8
+0b1111111010010010
 0b1111111000000000
-0b1001111010010010  ;9
+0b1001111010010010
 0b1111111000000000
-draw_char '$' 0 8
-draw_char '2' 4 8
-draw_char '.' 8 8
-draw_char '3' 12 8
-draw_char '3' 16 8
+0b0101110000000000
+0b0111010011010110
+0b1111001000000000
+0b1001111010010010
+0b0000000000000000
+0b0000000010000000
+0b1001001000000000
+0b1111111010010010
+0b1001001000000000
+0b1111111010010010
+start_of_command
+set w 61455
+set r 512
+set f 30
+load_from_register f z
+set count1 8
+mod_2 z x
+divide z z
+set y 1
+compare x y
+jump_when_less @1056
+save_from_register w r
+set x 32  ;1056
+add r x r
+set x -1
+add count1 x count1
+set y 1
+compare count1 y
+jump_when_less @1080
+jump @1039
+set x -255
+add r x r
+set x 0
+compare x z
+jump_when_less @1036
+set y 39
+compare f y
+set x 1
+add f x f
+jump_when_less @1033
 stop
 `
 
-// start_of_command
-// set count1 0
-// compare count1 32
+// load @6 char ;把memory的第6位给char
+// set count1 2
+// set x 0
+// compare count1 x
+// save c1 @50
 //
-// add count1 1 count1
-// compare count1 32
+// set count2 0
+// set y 8
+// compare count2 y
+// save c1 @51
+// jump_when_less
+// jump xxx
+// set z 2
+// set w 1
+// mod char z r
+// compare w r
+//
+//
+//
+// add count2 1 count2
+// add count1 -1 count1
 // jump_when_less 1027
+// jump 1027

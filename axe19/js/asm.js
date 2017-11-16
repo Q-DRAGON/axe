@@ -16,7 +16,6 @@ const clarify = function(asm){
 const assembler = function(asm_code) {
     // asm_code 是汇编字符串
     // 将汇编语言转成机器语言
-    log('old asm:\n', asm_code)
     asm = clarify(asm_code)
     asm.map(function(e, i){
         if (e in asm_d) {
@@ -27,6 +26,5 @@ const assembler = function(asm_code) {
             asm[i] = Number(e)
         }
     })
-    log('new asm:\n', asm)
     return asm
 }

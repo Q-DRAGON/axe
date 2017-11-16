@@ -36,12 +36,36 @@ const d = {
             f = i
         }
     },
+    0b0000001110000000: function(i){
+        if (i == undefined) {
+            return r
+        }else {
+            r = i
+        }
+    },
+    0b1000001100000000: function(i){
+        if (i == undefined) {
+            return w
+        }else {
+            w = i
+        }
+    },
+    0b1111111111111011: function(i){
+        if (i == undefined) {
+            return count1
+        }else {
+            count1 = i
+        }
+    },
 }
 
 const func_d = {
     0b0000000000000000: set,
     0b0000000100000000: load,
     0b0000001000000000: add,
+    0b0001000000000000: mod_2,
+    0b0010000000000000: divide,
+    0b0000100000000000: multiply,
     0b0000001100000000: save,
     0b0000011100000000: save_from_register,
     //  比较指令, 比较的是 x 和 y 的大小, 这个结果存在寄存器 c1 里面
@@ -52,4 +76,5 @@ const func_d = {
     0b1111111111111111: stop,
     0b1111111111111110: start_of_command,
     0b1111111111111101: draw_char,
+    0b0000100100000000: load_from_register,
 }

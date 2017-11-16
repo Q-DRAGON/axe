@@ -1,4 +1,4 @@
-const draw_char = functions(memory, char, x, y){
+const draw_char = function(memory, char, x, y){
     let index = (guacoding2[char] + 1) * 2
     let ele = memory[index].str(2) + memory[index + 1].str(2)
     let count = 0
@@ -17,10 +17,25 @@ const draw_char = functions(memory, char, x, y){
 }
 
 const start_of_command = function(memory){
-    while (memory.lenth < 1024) {
-        memory.push(0)
+
+    let i = memory.indexOf(0b1111111111111110)
+    if (i > -1) {
+        let address = 1025
+        memory.splice(i, 2)
+        while (i < address) {
+            memory.splice(i, 0, 0)
+            i++
+        }
     }
-    pc += 1
+}
+
+const load_from_register = function(memory) {
+    // load_from_register
+    let address = memory[pc + 1]
+    let register = memory[pc + 2]
+    let value = d[address]()
+    d[register](memory[value])
+    pc += 3
 }
 
 const compare = function(memory){
@@ -31,7 +46,7 @@ const compare = function(memory){
     let result
     if (a > b) {
         result = 2
-    }else if (a = b) {
+    }else if (a == b) {
         result = 1
     }else if (a < b) {
         result = 0
@@ -93,6 +108,36 @@ const add = function(memory){
     let b = d[x2]()
     let sum = a + b
     d[x3](sum)
+    pc += 4
+}
+
+const mod_2 = function(memory){
+    let x1 = memory[pc + 1]
+    let x2 = memory[pc + 2]
+    let a = d[x1]()
+    let b = 2
+    let result = a % b
+    d[x2](result)
+    pc += 3
+}
+
+const divide = function(memory){
+    let x1 = memory[pc + 1]
+    let x2 = memory[pc + 2]
+    let a = d[x1]()
+    let result = Math.floor(a / 2)
+    d[x2](result)
+    pc += 3
+}
+
+const multiply = function(memory){
+    let x1 = memory[pc + 1]
+    let x2 = memory[pc + 2]
+    let x3 = memory[pc + 3]
+    let a = d[x1]()
+    let b = d[x2]()
+    let mul = a * b
+    d[x3](mul)
     pc += 4
 }
 
