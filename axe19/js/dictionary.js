@@ -50,4 +50,6 @@ const func_d = {
     0b0000010100000000: jump,
     0b0000011000000000: jump_when_less,
     0b1111111111111111: stop,
+    0b1111111111111110: start_of_command,
+    0b1111111111111101: draw_char,
 }

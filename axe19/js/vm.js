@@ -6,16 +6,16 @@ const run = function(memory) {
     // 这是一个虚拟机程序
     // run 函数将 memory 数组视为内存，可以执行这个内存
     log('old memory', memory)
-    memory = enhance_memory(memory, 65535)
     while (pc < memory.length) {
         func_d[memory[pc]](memory)
     }
+    // memory = enhance_memory(memory, 512)
     colorscreen(memory)
     log('new memory', memory)
 }
 
 const colorscreen = function(memory){
-    let list = memory.slice(-10000,)
+    let list = memory.slice(512, 1024)
     let canvas = _e('#id-canvas')
     let context = canvas.getContext('2d')
     let pixels = context.getImageData(0, 0, 32, 16)

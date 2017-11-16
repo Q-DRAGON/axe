@@ -1,3 +1,28 @@
+const draw_char = functions(memory, char, x, y){
+    let index = (guacoding2[char] + 1) * 2
+    let ele = memory[index].str(2) + memory[index + 1].str(2)
+    let count = 0
+    while (count < 32) {
+        for (let i = 0; i < 4; i++) {
+            for (let j = 0; i < 8; i++) {
+                if (ele[count] == '1') {
+                    memory[32 * j + i + x] = 61455
+                }else {
+                    memory[32 * j + i + x] = 0
+                }
+            }
+        }
+        count ++
+    }
+}
+
+const start_of_command = function(memory){
+    while (memory.lenth < 1024) {
+        memory.push(0)
+    }
+    pc += 1
+}
+
 const compare = function(memory){
     let index1 = memory[pc + 1]
     let index2 = memory[pc + 2]
