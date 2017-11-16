@@ -67,13 +67,6 @@ jump @1024
 0b1111111000000000
 0b1001111010010010  ;9
 0b1111111000000000
-start_of_command
-set count1 0
-compare count1 32
-
-add count1 1 count1
-compare count1 32
-jump_when_less 1027
 draw_char '$' 0 8
 draw_char '2' 4 8
 draw_char '.' 8 8
@@ -81,3 +74,11 @@ draw_char '3' 12 8
 draw_char '3' 16 8
 stop
 `
+
+// start_of_command
+// set count1 0
+// compare count1 32
+//
+// add count1 1 count1
+// compare count1 32
+// jump_when_less 1027

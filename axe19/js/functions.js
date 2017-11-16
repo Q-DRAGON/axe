@@ -4,7 +4,7 @@ const draw_char = functions(memory, char, x, y){
     let count = 0
     while (count < 32) {
         for (let i = 0; i < 4; i++) {
-            for (let j = 0; i < 8; i++) {
+            for (let j = 0; j < 8; j++) {
                 if (ele[count] == '1') {
                     memory[32 * j + i + x] = 61455
                 }else {
