@@ -5,6 +5,9 @@ const asm_d = {
     'z': 0b0000001100000000,
     'c1': 0b0000010000000000,
     'f': 0b0000010100000000,
+    'count1': 0b1111111111111011,
+    'count2': 0b1111111111110111,
+    'count3': 0b1111111111101111,
     'set': 0b0000000000000000,
     'load': 0b0000000100000000,
     'add': 0b0000001000000000,
@@ -65,6 +68,12 @@ jump @1024
 0b1001111010010010  ;9
 0b1111111000000000
 start_of_command
+set count1 0
+compare count1 32
+
+add count1 1 count1
+compare count1 32
+jump_when_less 1027
 draw_char '$' 0 8
 draw_char '2' 4 8
 draw_char '.' 8 8

@@ -45,7 +45,7 @@ const jump = function(memory){
 }
 
 const jump_when_less = function(memory){
-    if (c1 < 0) {
+    if (c1 == 0) {
         pc = memory[pc + 1]
     }else {
         pc += 2
