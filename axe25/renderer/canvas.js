@@ -1,40 +1,21 @@
 class GuaCanvas extends GuaObject {
     constructor(selector) {
         super()
-        let canvas = _e(selector)
+        var canvas = _e(selector)
         this.canvas = canvas
         this.context = canvas.getContext('2d')
         this.w = canvas.width
         this.h = canvas.height
         this.pixels = this.context.getImageData(0, 0, this.w, this.h)
         this.bytesPerPixel = 4
-        // this.pixelBuffer = this.pixels.data
-        this.start = null
-        this.end = null
-        this.listenMouse()
-        this.enableDraw = false
         this.data = null
-        this.drawStyle = 'line'
         this.penColor = GuaColor.black()
-        this.elements = []
     }
     render() {
         // 执行这个函数后, 才会实际地把图像画出来
         // ES6 新语法, 取出想要的属性并赋值给变量, 不懂自己搜「ES6 新语法」
         let {pixels, context} = this
         context.putImageData(pixels, 0, 0)
-    }
-    clear(color=GuaColor.white()) {
-        // color GuaColor
-        // 用 color 填充整个 canvas
-        // 遍历每个像素点, 设置像素点的颜色
-        let {w, h} = this
-        for (let x = 0; x < w; x++) {
-            for (let y = 0; y < h; y++) {
-                this._setPixel(x, y, color)
-            }
-        }
-        this.render()
     }
     _setPixel(x, y, color) {
         // color: GuaColor
@@ -54,54 +35,7 @@ class GuaCanvas extends GuaObject {
         p[i+2] = b
         p[i+3] = a
     }
-    listenMouse(){
-        var self = this
-        self.canvas.addEventListener('mousedown', function(event) {
-            self.enableDraw = true
-            var x = event.offsetX
-            var y = event.offsetY
-            self.start = GuaPoint.new(x, y)
-            self.data = new Uint8ClampedArray(self.pixels.data)
-            if (self.drawStyle == 'button') {
-                for (var e of self.elements) {
-                    if (e.hasMouseIn(self.start) == true) {
-                        e.action()
-                        self.data = new Uint8ClampedArray(self.pixels.data)
-                        self.drawButton(e.position, e.size, e.highlightcolor)
-                    }
-                }
-            }
-        })
-        this.canvas.addEventListener('mousemove', function(event) {
-            if (self.enableDraw == true) {
-                var x = event.offsetX
-                var y = event.offsetY
-                self.end = GuaPoint.new(x, y)
-                if (self.drawStyle == 'line') {
-                    self.pixels.data.set(self.data)
-                    self.drawLine(self.start, self.end, self.penColor)
-                }else if (self.drawStyle == 'rect') {
-                    self.pixels.data.set(self.data)
-                    var size = GuaSize.new(self.end.x - self.start.x, self.end.y - self.start.y)
-                    self.drawRect(self.start, size, null, self.penColor)
-                }
-                self.render()
-            }
-        })
-        this.canvas.addEventListener('mouseup', function(event) {
-            self.enableDraw = false
-            var x = event.offsetX
-            var y = event.offsetY
-            self.end = GuaPoint.new(x, y)
-            if (self.drawStyle == 'button') {
-                self.pixels.data.set(self.data)
-                self.render()
-            }
-        })
-
-    }
     drawPoint(point, color=GuaColor.black()) {
-        // point: GuaPoint
         let {w, h} = this
         let p = point
         if (p.x >= 0 && p.x <= w) {
@@ -110,86 +44,65 @@ class GuaCanvas extends GuaObject {
             }
         }
     }
-    drawLine(p1, p2, color=GuaColor.black()) {
-        // p1 p2 分别是起点和终点, GuaPoint 类型
-        // color GuaColor
-        // 使用 drawPoint 函数来画线
-        let dx = p2.x - p1.x
-        let dy = p2.y - p1.y
-        if (Math.abs(dy) > Math.abs(dx)) {
-            let y = p1.y
-            while (y !== p2.y) {
-                let x = dx / dy * (y - p1.y) + p1.x
-                let point = GuaPoint.new(x, y)
-                this.drawPoint(point, color)
-                let i = dy > 0 ? 1 : -1
-                y += i
-            }
-        }else{
-            let x = p1.x
-            while (x !== p2.x) {
-                let y = dx == 0 ? p1.y : dy / dx * (x - p1.x) + p1.y
-                let point = GuaPoint.new(x, y)
-                this.drawPoint(point, color)
-                let i = dx > 0 ? 1 : -1
-                x += i
-            }
-        }
-    }
-    drawRect(upperLeft, size, fillColor=null, borderColor=GuaColor.black()) {
-        // upperLeft: GuaPoint, 矩形左上角座标
-        // size: GuaSize, 矩形尺寸
-        // fillColor: GuaColor, 矩形的填充颜色, 默认为空, 表示不填充
-        // borderColor: GuaColor, 矩形的的边框颜色, 默认为黑色
-        let x = upperLeft.x
-        let y = upperLeft.y
-        let p1 = GuaPoint.new(x, y)
-        let p2 = GuaPoint.new(x + size.w, y)
-        let p3 = GuaPoint.new(x + size.w, y + size.h)
-        let p4 = GuaPoint.new(x, y + size.h)
-        this.drawLine(p1, p2, borderColor)
-        this.drawLine(p2, p3, borderColor)
-        this.drawLine(p3, p4, borderColor)
-        this.drawLine(p4, p1, borderColor)
-        if (fillColor != null) {
-            for (var j = y + 1; j < p3.y; j++) {
-                this.drawLine(GuaPoint.new(x + 1, j), GuaPoint.new(p2.x, j), fillColor)
-            }
-        }
-    }
-    drawButton(upperLeft, size, fillColor=null, borderColor=GuaColor.black()){
-        var self = this
-        self.drawRect(upperLeft, size, fillColor, borderColor)
-        self.render()
-    }
-    addElement(element){
-        var self = this
-        self.drawButton(element.position, element.size)
-        self.elements.push(element)
-    }
-    __debug_draw_demo() {
-        // 这是一个 demo 函数, 用来给你看看如何设置像素
-        // ES6 新语法, 取出想要的属性并赋值给变量, 不懂自己搜「ES6 新语法」
-        let {context, pixels} = this
-        // 获取像素数据, data 是一个数组
-        let data = pixels.data
-        // 一个像素 4 字节, 分别表示 r g b a
-        for (let i = 0; i < data.length; i += 4) {
-            let [r, g, b, a] = data.slice(i, i + 4)
-            r = 255
-            a = 255
-            data[i] = r
-            data[i+3] = a
-        }
-        context.putImageData(pixels, 0, 0)
-    }
     drawScanline(v1, v2){
         // v1 v2 是 y 相等的 2 个 GuaVertex
-
+        // 画有颜色的直线
+        let [a, b] = [v1, v2].sort(function(a,b){
+            return a.position.x - b.position.x;
+        })
+        let x1 = int(a.position.x)
+        let x2 = int(b.position.x)
+        let y = int(a.position.y)
+        var sign = 0
+        sign = (x2 > x1) ? 1 : -1
+        let factor = 0
+        for (var i = x1; i <= x2 + sign * 1; i += sign) {
+            if (x1 != x2) {
+                factor = (i - x1) / (x2 - x1)
+            }
+            var color = interpolate(a.color, b.color, factor)
+            var vector = GuaVector.new(i, y)
+            this.drawPoint(vector, color)
+        }
+        this.render()
     }
-    GuaCanvas.drawTriangle(v1, v2, v3){
+    drawTriangle(v1, v2, v3){
         // v1 v2 v3 都是 GuaVertex
         // 作为三角形的 3 个顶点
-
+        let [a, b, c] = [v1, v2, v3].sort(function(a,b){
+            return a.position.y - b.position.y;
+        })
+        let middle_factor = 0
+        if (c.position.y - a.position.y != 0) {
+            middle_factor = (b.position.y - a.position.y) / (c.position.y - a.position.y)
+        }
+        let middle = interpolate(a, c, middle_factor)
+        let start_y = int(a.position.y)
+        let end_y = int(b.position.y)
+        for (var i = start_y; i < end_y + 1; i++) {
+            let factor = 0
+            if (end_y != start_y) {
+                factor = (i - start_y) / (end_y - start_y)
+            } else {
+                factor = 0
+            }
+            let va = interpolate(a, b, factor)
+            let vb = interpolate(a, middle, factor)
+            this.drawScanline(va, vb)
+        }
+        start_y = int(b.position.y)
+        end_y = int(c.position.y)
+        for (var j = start_y; j < end_y + 1; j++) {
+            let factor = 0
+            if (end_y != start_y) {
+                factor = (j - start_y) / (end_y - start_y)
+            } else {
+                factor = 0
+            }
+            let va = interpolate(b, c, factor)
+            let vb = interpolate(middle, c, factor)
+            this.drawScanline(va, vb)
+        }
+        this.render()
     }
 }
