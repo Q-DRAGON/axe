@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>作业 26</title>
+        <style>
+            canvas {
+                outline: 1px dashed lightskyblue;
+            }
+        </style>
+        <!-- 引入所有用到的文件 -->
+        <script src='utils.js'></script>
+        <script src='gua_object.js'></script>
+        <script src='vertex.js'></script>
+        <script src='vector.js'></script>
+        <script src='gua_color.js'></script>
+        <script src='canvas.js'></script>
+        <script src='matrix.js'></script>
+        <script src='test_matrix.js'></script>
+    </head>
+    <body>
+        <canvas id="id-canvas" width="400" height="300"></canvas>
+        <br>
+<script>
+// 函数名应该用 const 修饰, 这样不会被意外修改
+const __main = function() {
+    let canvas = GuaCanvas.new('#id-canvas')
+    v1 = GuaVertex.new(GuaVector.new(0, 50), GuaColor.white())
+    v2 = GuaVertex.new(GuaVector.new(400, 50), GuaColor.blue())
+    v3 = GuaVertex.new(GuaVector.new(100, 100), GuaColor.green())
+    v4 = GuaVertex.new(GuaVector.new(300, 200), GuaColor.cyan())
+    v5 = GuaVertex.new(GuaVector.new(120, 280), GuaColor.blue())
+    canvas.drawScanline(v1, v2)
+    canvas.drawTriangle(v3, v4, v5)
+
+    let tm = new TestMatrix()
+    tm.test()
+}
+
+__main()
+</script>
+    </body>
+</html>
