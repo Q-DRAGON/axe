@@ -1,0 +1,63 @@
+作业 28
+
+作业截止时间
+周四（12.07） 22:00
+
+
+作业内容如下, 在压缩包提供的文件的基础上实现
+
+
+
+1, zbuffer 的实现
+
+现在打开 index.html 会发现渲染出来的立方体的遮挡顺序不对
+需要使用一个额外的数组存储每个像素的 z 值（深度值）
+然后在 setPixel 的时候比较当前像素的 z 和存储的 z 来决定是否设置像素
+这样就可以实现正确的遮挡顺序
+
+请参考下面链接的相关代码
+https://github.com/guaxiao/renderer.gua/blob/master/src/canvas.cpp
+
+
+
+2, 实现加载 gua3d 文件为 GuaMesh
+
+增加 GuaMesh.fromGua3d(gua3dString) 方法, 返回一个 GuaMesh 对象
+其中 gua3dString 是下面链接这个文件的内容（字符串类型）
+https://raw.githubusercontent.com/guaxiao/renderer.gua/master/illidan.gua3d
+因为 js 在浏览器中加载文件麻烦  所以直接把 illidan.gua3d 文件的内容写在文件中（字符串）
+第一行固定为 gua3d
+第二行是文件格式版本 version 1.1
+第三行是顶点数量 vertices 4042
+第四行是三角形数量 triangles 5603
+
+每一行顶点数据有 7 个由空格分格的数据
+分别是
+x y z 是座标
+nx ny nz 是顶点法向量
+u v 是顶点贴图的 u v
+-0.0957 2.5732 0.1076 -0.277 -0.9525 -0.1268 0.075 0.9783
+本次作业不需要使用 u v 贴图所以 uv 数据可以抛弃
+
+
+
+3, 实现加载 guaimage 文件并显示在一个 canvas 中
+guaimage 的内容如下
+https://raw.githubusercontent.com/guaxiao/renderer.gua/master/illidan.guaimage
+使用方法同 gua3d
+第一行固定为 guaimage
+第二行是文件格式版本 1.0
+第三行是宽 256
+第四行是高 256
+每一个像素用空格隔开, 是一个 32 位的数字
+数字从高到低每一个字节分别表示 r g b a
+解析这个需要用到位运算
+注意, js 中需要使用 无符号位移 这个操作（自行搜索）
+
+
+
+4, 简述三维物体的表示方式
+
+
+
+5, 简述三维物体在屏幕上显示的整个流水线（流程）
