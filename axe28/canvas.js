@@ -19,6 +19,7 @@ class GuaCanvas extends GuaObject {
         this.bytesPerPixel = 4
         // this.pixelBuffer = this.pixels.data
         this.camera = GuaCamera.new()
+        this.zbuffer = []
     }
     render() {
         // 执行这个函数后, 才会实际地把图像画出来
@@ -33,7 +34,7 @@ class GuaCanvas extends GuaObject {
         let {w, h} = this
         for (let x = 0; x < w; x++) {
             for (let y = 0; y < h; y++) {
-                this._setPixel(x, y, color)
+                this._setPixel(x, y, 1000000, color)
             }
         }
         this.render()
@@ -48,13 +49,14 @@ class GuaCanvas extends GuaObject {
         let p = this.pixels.data
         return GuaColor.new(p[i], p[i+1], p[i+2], p[i+3])
     }
-    _setPixel(x, y, color) {
+    _setPixel(x, y, z, color) {
         // color: GuaColor
         // 这个函数用来设置像素点, _ 开头表示这是一个内部函数, 这是我们的约定
         // 浮点转 int
         let int = Math.round
         x = int(x)
         y = int(y)
+        z = Number(z)
         // 用座标算像素下标
         let i = (y * this.w + x) * this.bytesPerPixel
         // 设置像素
@@ -65,17 +67,78 @@ class GuaCanvas extends GuaObject {
         p[i+1] = int(g)
         p[i+2] = int(b)
         p[i+3] = int(a)
+
+        let index = y * this.w + x
+        this.zbuffer[index] = z
     }
     drawPoint(point, color=GuaColor.black()) {
         // point: GuaPoint
         let {w, h} = this
         let p = point
-        if (p.x >= 0 && p.x <= w) {
-            if (p.y >= 0 && p.y <= h) {
-                this._setPixel(p.x, p.y, color)
+        let newindex = Math.round(p.y) * w + Math.round(p.x)
+        if (p.z <= this.zbuffer[newindex]) {
+            if (p.x >= 0 && p.x <= w) {
+                if (p.y >= 0 && p.y <= h) {
+                    this._setPixel(p.x, p.y, p.z, color)
+                }
             }
         }
     }
+    // drawLine(v1, v2, color=GuaColor.black()) {
+        // v1 v2 分别是起点和终点
+        // color GuaColor
+        // 使用 drawPoint 函数来画线
+    //     let [x1, y1, z1, x2, y2, z2] = [v1.x, v1.y, v1.z, v2.x, v2.y, v2.z]
+    //     let dx = x2 - x1
+    //     let dy = y2 - y1
+    //     let dz = z2 - z1
+    //
+    //     if(Math.abs(dx) > Math.abs(dy)) {
+    //         let xmin = Math.min(x1, x2)
+    //         let xmax = Math.max(x1, x2)
+    //         let zmin = Math.min(z1, z2)
+    //         let zmax = Math.max(z1, z2)
+    //         let ratioyx = dx == 0 ? 0 : dy / dx
+    //         let ratiozx = dx == 0 ? 0 : dz / dx
+    //         let ratioxz = dz == 0 ? 0 : dx / dz
+    //         let ratioyz = dz == 0 ? 0 : dy / dx
+    //         if (Math.abs(dx) > Math.abs(dz)) {
+    //             for(let x = xmin; x < xmax; x++) {
+    //                 let y = y1 + (x - x1) * ratioyx
+    //                 let z = z1 + (x - x1) * ratiozx
+    //                 this.drawPoint(GuaVector.new(x, y, z), color)
+    //             }
+    //         }else {
+    //             for(let z = zmin; z < zmax; z++) {
+    //                 let y = y1 + (z - z1) * ratioyz
+    //                 let x = x1 + (z - z1) * ratioxz
+    //                 this.drawPoint(GuaVector.new(x, y, z), color)
+    //             }
+    //         }
+    //     } else {
+    //         let ymin = Math.min(y1, y2)
+    //         let ymax = Math.max(y1, y2)
+    //         let zmin = Math.min(z1, z2)
+    //         let zmax = Math.max(z1, z2)
+    //         let ratioxy = dy == 0 ? 0 : dx / dy
+    //         let ratiozy = dy == 0 ? 0 : dz / dy
+    //         let ratioxz = dz == 0 ? 0 : dx / dz
+    //         let ratioyz = dz == 0 ? 0 : dy / dz
+    //         if (Math.abs(dy) > Math.abs(dz)) {
+    //             for(let y = ymin; y < ymax; y++) {
+    //                 let x = x1 + (y - y1) * ratioxy
+    //                 let z = z1 + (y - y1) * ratiozy
+    //                 this.drawPoint(GuaVector.new(x, y, z), color)
+    //             }
+    //         }else {
+    //             for(let z = zmin; z < zmax; z++) {
+    //                 let x = x1 + (z - z1) * ratioxz
+    //                 let y = y1 + (z - z1) * ratioyz
+    //                 this.drawPoint(GuaVector.new(x, y, z), color)
+    //             }
+    //         }
+    //     }
+    // }
     drawLine(v1, v2, color=GuaColor.black()) {
         // v1 v2 分别是起点和终点
         // color GuaColor
@@ -90,7 +153,13 @@ class GuaCanvas extends GuaObject {
             let ratio = dx == 0 ? 0 : dy / dx
             for(let x = xmin; x < xmax; x++) {
                 let y = y1 + (x - x1) * ratio
-                this.drawPoint(GuaVector.new(x, y), color)
+                let factor = 0
+                if (x2 != x1) {
+                    factor = (x - x1) / (x2 - x1);
+                }
+                let v = v1.interpolate(v2, factor)
+                v.z -= 0.0001
+                this.drawPoint(v, color)
             }
         } else {
             let ymin = Math.min(y1, y2)
@@ -98,7 +167,13 @@ class GuaCanvas extends GuaObject {
             let ratio = dy == 0 ? 0 : dx / dy
             for(let y = ymin; y < ymax; y++) {
                 let x = x1 + (y - y1) * ratio
-                this.drawPoint(GuaVector.new(x, y), color)
+                let factor = 0
+                if (y2 != y1) {
+                    factor = (y - y1) / (y2 - y1);
+                }
+                let v = v1.interpolate(v2, factor)
+                v.z -= 0.0001
+                this.drawPoint(v, color)
             }
         }
     }
@@ -113,7 +188,8 @@ class GuaCanvas extends GuaObject {
                 factor = (x - x1) / (x2 - x1);
             }
             let color = a.color.interpolate(b.color, factor)
-            this.drawPoint(GuaVector.new(x, y), color)
+            let newvector = a.position.interpolate(b.position, factor)
+            this.drawPoint(newvector, color)
         }
     }
     drawTriangle(v1, v2, v3) {
@@ -149,6 +225,18 @@ class GuaCanvas extends GuaObject {
             this.drawScanline(va, vb)
         }
     }
+    drawImage(guaimage){
+        let list = guaimage.split('\n').join(' ').split(' ')
+        this.width = Number(list[2])
+        this.height = Number(list[3])
+        let data = []
+        for (var i = 4; i < list.length; i++) {
+            data.push(Number(list[i]))
+        }
+        // this.pixels.data = data
+        
+
+    }
     // drawTriangleLine
     project(coordVector, transformMatrix) {
         let {w, h} = this
@@ -157,7 +245,7 @@ class GuaCanvas extends GuaObject {
         let x = point.x * w2 + w2
         let y = - point.y * h2 + h2
 
-        let v = GuaVector.new(x, y, coordVector.position.z)
+        let v = GuaVector.new(x, y, point.z)
         return GuaVertex.new(v, coordVector.color)
     }
     drawMesh(mesh) {

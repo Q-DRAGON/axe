@@ -11,7 +11,8 @@ class GuaVector extends GuaObject {
         let p2 = other
         let x = p1.x + (p2.x - p1.x) * factor
         let y = p1.y + (p2.y - p1.y) * factor
-        return GuaVector.new(x, y)
+        let z = p1.z + (p2.z - p1.z) * factor
+        return GuaVector.new(x, y, z)
     }
     toString() {
         let s = ''
