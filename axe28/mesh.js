@@ -3,7 +3,7 @@ class GuaMesh extends GuaObject {
     constructor() {
         super()
 
-        this.position = GuaVector.new(0, -3, 0)
+        this.position = GuaVector.new(0, -2, 0)
         this.rotation = GuaVector.new(0, 0, 0)
         this.scale = GuaVector.new(1, 1, 1)
         this.vertices = null

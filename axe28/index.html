@@ -26,30 +26,40 @@
         <canvas id="id-canvas" width="400" height="300"></canvas>
 <script>
 // 函数名应该用 const 修饰, 这样不会被意外修改
-const __main = function() {
+test1 = function(){
     let canvas = GuaCanvas.new('#id-canvas')
-    // let v1 = GuaVertex.new(GuaVector.new(150, 10), GuaColor.red())
-    // let v2 = GuaVertex.new(GuaVector.new(10, 100), GuaColor.blue())
-    // let v3 = GuaVertex.new(GuaVector.new(300, 200), GuaColor.green())
-    // canvas.drawScanline(v1, v2)
-    // canvas.drawTriangle(v1, v2, v3)
-    // let mesh = GuaMesh.cube()
-    let mesh = GuaMesh.fromGua3d(illidan)
-    // canvas.drawMesh(mesh)
-    canvas.drawImage(guaimage)
-    //
+    let mesh = GuaMesh.cube()
+    canvas.drawMesh(mesh)
     canvas.render()
-
     setInterval(function() {
         canvas.clear()
-        // mesh.rotation.x += 0.1
         mesh.rotation.y += 0.1
         canvas.drawMesh(mesh)
-        //
         canvas.render()
     }, 100)
-    // let tm = new TestMatrix()
-    // tm.test()
+}
+test2 = function(){
+    let canvas = GuaCanvas.new('#id-canvas')
+    let mesh = GuaMesh.fromGua3d(illidan)
+    canvas.drawMesh(mesh)
+    canvas.render()
+    setInterval(function() {
+        canvas.clear()
+        mesh.rotation.y += 0.1
+        canvas.drawMesh(mesh)
+        canvas.render()
+    }, 100)
+}
+test3 = function(){
+    let canvas = GuaCanvas.new('#id-canvas')
+    canvas.clear()
+    canvas.drawImage(guaimage)
+    canvas.render()
+}
+const __main = function() {
+    // test1()
+    test2()
+    // test3()
 }
 
 __main()

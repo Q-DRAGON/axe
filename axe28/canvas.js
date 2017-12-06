@@ -230,11 +230,20 @@ class GuaCanvas extends GuaObject {
         this.width = Number(list[2])
         this.height = Number(list[3])
         let data = []
-        for (var i = 4; i < list.length; i++) {
+        for (let i = 4; i < list.length; i++) {
             data.push(Number(list[i]))
         }
-        // this.pixels.data = data
-        
+        for (let j = 0; j < this.height; j++) {
+            for (let i = 0; i < this.width; i++) {
+                let x = i
+                let y = j
+                let point = GuaVector.new(x, y, 0)
+                let index = (y - 1) * this.width + x
+                let color = GuaColor.from32torgba(data[index])
+                this.drawPoint(point, color)
+            }
+        }
+
 
     }
     // drawTriangleLine

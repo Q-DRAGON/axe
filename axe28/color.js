@@ -54,4 +54,11 @@ class GuaColor extends GuaObject {
     static blue() {
         return this.new(0, 0, 255, 255)
     }
+    static from32torgba(color){
+        let r = color >>>24
+        let g = color << 8 >>>24
+        let b = color << 16 >>>24
+        let a = color << 24 >>>24
+        return this.new(r, g, b, a)
+    }
 }
