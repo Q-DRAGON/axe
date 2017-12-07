@@ -33,7 +33,7 @@ class GuaColor extends GuaObject {
     // 随机颜色
     static randomColor() {
         // random01 是 utils.js 中的函数
-        return this.new(random01(), random01(), random01(), 1)
+        return this.new(random01() * 255, random01() * 255, random01() * 255, 1 * 255)
     }
     // 常见的几个颜色
     static black() {

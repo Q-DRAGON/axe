@@ -9,7 +9,6 @@ class GuaMesh extends GuaObject {
         this.vertices = null
         this.indices = null
     }
-    // 返回一个正方体
     static fromGua3d(gua3dString){
         let list = gua3dString.split('\n').join(' ').split(' ')
         // let string1 = list1.join(' ')
@@ -26,8 +25,8 @@ class GuaMesh extends GuaObject {
         let vertices = []
         for (let i = 0; i < points.length; i += 3) {
             let v = GuaVector.new(points[i], points[i+1], points[i+2])
-            // let c = GuaColor.randomColor()
-            let c = GuaColor.green()
+            let c = GuaColor.randomColor()
+            // let c = GuaColor.green()
             vertices.push(GuaVertex.new(v, c))
         }
 
@@ -56,8 +55,8 @@ class GuaMesh extends GuaObject {
         let vertices = []
         for (let i = 0; i < points.length; i += 3) {
             let v = GuaVector.new(points[i], points[i+1], points[i+2])
-            // let c = GuaColor.randomColor()
-            let c = GuaColor.red()
+            let c = GuaColor.randomColor()
+            // let c = GuaColor.red()
             vertices.push(GuaVertex.new(v, c))
         }
 
