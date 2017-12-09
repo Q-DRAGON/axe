@@ -9,8 +9,6 @@ class GuaMesh extends GuaObject {
         this.vertices = null
         this.indices = null
         this.texture = undefined
-        this.texturew = null
-        this.textureh = null
     }
     static makeTexture(guaimage){
         let list = guaimage.split('\n').join(' ').split(' ')
