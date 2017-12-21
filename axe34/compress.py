@@ -39,13 +39,6 @@ lzw 这一步选做
 """
 
 
-def grayimage(path):
-    # convert('L') 转为灰度图
-    # 这样每个像素点就只有一个灰度数据
-    img = Image.open(path).convert('L')
-    return img
-
-
 def image_fft(image):
     # 对图像做二维 fft
     a = np.fft.fft2(image)
@@ -92,7 +85,7 @@ def filter_image(data, ratio=1):
     return r
 
 
-def preview(de_image):
+def preview(img):
     """
     这里利用 matplotlib 把图像画出来预览
     很好理解
@@ -102,12 +95,23 @@ def preview(de_image):
         # 从 1 到 9 选择画在第 n 个子图
         plot.subplot(m, n, i+1)
         # 这里可以设置不同的过滤等级（压缩等级）
-        # img = filter_image(data, 0.1 * i + 0.05)
-        img, plot_data = colorimg(de_image, 0.1 * i + 0.05)
-        b = decompress_image(img)
-        plot_data = np.uint8(b)
+        # 题2 不切小格子
+        # de_image = compress(img, 0.1 * i + 0.05)
+        # 题3 切小格子
+        newimg = Image.new(img.mode, img.size)
+        for k in range(int(img.size[0] / 8)):
+            for j in range(int(img.size[1] / 8)):
+                x1 = 8 * j
+                x2 = x1 + 8
+                y1 = 8 * k
+                y2 = y1 + 8
+                region = (x1, y1, x2, y2)
+                cropImg = img.crop(region).convert('RGB')
+                de_cropImg = compress(cropImg, 0.1 * i + 0.05)
+                newimg.paste(de_cropImg, (x1, y1))
+        de_image = newimg
         # 画图
-        plot.imshow(plot_data, cmap=plot.cm.gray)
+        plot.imshow(de_image, cmap=plot.cm.gray)
         plot.grid(False)
         plot.xticks([])
         plot.yticks([])
@@ -115,15 +119,14 @@ def preview(de_image):
     plot.show()
 
 
-def compressgray(ipath, ratio):
-    img = grayimage(ipath)
+def compressgray(img, ratio):
     data = image_fft(img)
     a = filter_image(data, ratio)
     b = decompress_image(a)
-    return b, data
+    return np.uint8(b)
 
 
-def colorimg(img, ratio):
+def compresscolor(img, ratio):
     img = img.split()
     data0 = image_fft(img[0])
     data1 = image_fft(img[1])
@@ -138,24 +141,36 @@ def colorimg(img, ratio):
     g = Image.fromarray(np.uint8(b1))
     b = Image.fromarray(np.uint8(b2))
     im = Image.merge('RGB', (r, g, b))
-    data = image_fft(im)
-    return im, data
+    return im
 
 
-def compresscolor(ipath, ratio):
-    img = Image.open(ipath).convert('RGB')
-    im, data = colorimg(img, ratio)
-    return im, data
+def compress(img, ratio):
+    if img.mode == 'L':
+        de_image = compressgray(img, ratio)
+    elif img.mode == 'RGB':
+        de_image = compresscolor(img, ratio)
+    return de_image
+
+
+def load(path):
+    img = Image.open(path)
+    # 题1 灰度图
+    # img = img.convert('L')
+    # 题2 彩色图
+    img = img.convert('RGB')
+    return img
 
 
 def main():
     ipath = 'lena.png'
     opath = 'lena2.png'
-    # de_image, data = compressgray(ipath, 0.6)
-    de_image, data = compresscolor(ipath, 0.6)
+    img = load(ipath)
+    ratio = 0.6
+    # 显示9图
+    preview(img)
+    # 存1图
+    de_image = compress(img, ratio)
     save_image(de_image, opath)
-    #
-    preview(de_image)
 
 
 if __name__ == '__main__':
