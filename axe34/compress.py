@@ -78,16 +78,21 @@ def filter_image(data, ratio=1):
     """
     # 造一个空数组并复制数据
     r = np.zeros_like(data)
+    h = len(data)
+    w = len(data[0])
     for i, row in enumerate(data):
         for j, n in enumerate(row):
             # 在这里可以根据压缩率选择性地丢弃部分高频数据
             # 请注意，高频数据在右下角
             # r[i, j] 这种用法是 numpy 的用法
-            r[i, j] = n
+            if (i + j) > (h + w) * ratio:
+                r[i, j] = 0
+            else:
+                r[i, j] = n
     return r
 
 
-def preview(data):
+def preview(de_image):
     """
     这里利用 matplotlib 把图像画出来预览
     很好理解
@@ -97,7 +102,8 @@ def preview(data):
         # 从 1 到 9 选择画在第 n 个子图
         plot.subplot(m, n, i+1)
         # 这里可以设置不同的过滤等级（压缩等级）
-        img = filter_image(data)
+        # img = filter_image(data, 0.1 * i + 0.05)
+        img, plot_data = colorimg(de_image, 0.1 * i + 0.05)
         b = decompress_image(img)
         plot_data = np.uint8(b)
         # 画图
@@ -109,16 +115,47 @@ def preview(data):
     plot.show()
 
 
+def compressgray(ipath, ratio):
+    img = grayimage(ipath)
+    data = image_fft(img)
+    a = filter_image(data, ratio)
+    b = decompress_image(a)
+    return b, data
+
+
+def colorimg(img, ratio):
+    img = img.split()
+    data0 = image_fft(img[0])
+    data1 = image_fft(img[1])
+    data2 = image_fft(img[2])
+    a0 = filter_image(data0, ratio)
+    a1 = filter_image(data1, ratio)
+    a2 = filter_image(data2, ratio)
+    b0 = decompress_image(a0)
+    b1 = decompress_image(a1)
+    b2 = decompress_image(a2)
+    r = Image.fromarray(np.uint8(b0))
+    g = Image.fromarray(np.uint8(b1))
+    b = Image.fromarray(np.uint8(b2))
+    im = Image.merge('RGB', (r, g, b))
+    data = image_fft(im)
+    return im, data
+
+
+def compresscolor(ipath, ratio):
+    img = Image.open(ipath).convert('RGB')
+    im, data = colorimg(img, ratio)
+    return im, data
+
+
 def main():
     ipath = 'lena.png'
     opath = 'lena2.png'
-    img = grayimage(ipath)
-    data = image_fft(img)
-    a = filter_image(data)
-    b = decompress_image(a)
-    save_image(b, opath)
+    # de_image, data = compressgray(ipath, 0.6)
+    de_image, data = compresscolor(ipath, 0.6)
+    save_image(de_image, opath)
     #
-    preview(data)
+    preview(de_image)
 
 
 if __name__ == '__main__':
