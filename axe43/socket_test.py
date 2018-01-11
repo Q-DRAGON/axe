@@ -4,6 +4,9 @@
     不输出任何数据到终端
     记得 join
     本作业为 socket_test.py
+
+4, 测试 3 种服务器方案的吞吐量（分别是 单进程单线程 多线程 多进程）
+    使用命令 time python3 socket_test.py
 """
 import threading
 import socket
@@ -18,7 +21,7 @@ def send_socket():
 
 def main():
     threads = []
-    for i in range(1000):
+    for i in range(3000):
         t = threading.Thread(target=send_socket, name=str(i))
         threads.append(t)
         t.start()
