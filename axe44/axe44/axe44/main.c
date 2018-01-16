@@ -58,6 +58,7 @@ main(int argc, const char *argv[]) {
     // 每个任务要花费 1 秒
     // 总共要花费 4 秒执行完所有线程
     for(int i = 0; i < numberOfTasks; ++i) {
+//        printf("i:%d\n", i);
         int *n = malloc(sizeof(int));
         *n = i;
         GuaThreadPoolAddTask(pool, printTask, n);

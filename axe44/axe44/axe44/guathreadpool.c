@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <unistd.h>
+#include <pthread.h>
+
 
 #include "guathreadpool.h"
 
@@ -13,11 +15,6 @@ typedef struct _Task GuaTask;
 
 struct _TaskQueue;
 typedef struct _TaskQueue GuaTaskQueue;
-// GuaTaskQueue 的定义和接口你自己来根据需要补全
-
-
-struct _GuaThreadPool;
-typedef struct _GuaThreadPool GuaThreadPool;
 
 
 struct _Task {
@@ -27,95 +24,128 @@ struct _Task {
 };
 
 
+// GuaTaskQueue 的定义和接口你自己来根据需要补全
 struct _TaskQueue {
     int length;
     GuaTask *next;
+    GuaTask *tail;
 };
 
 
 struct _GuaThreadPool {
     int numberOfThreads;        // 线程池中的线程数量
     pthread_t *threads;         // 线程池中所有线程的 id
-    // 线程锁
-    pthread_mutex_t mutex;
-    // 可以进行的线程
-    pthread_cond_t cond;
-    GuaTask *queue_head;
+    GuaTaskQueue *queue;
     int shutdown;
-    int cur_queue_size;
 };
 
+GuaTaskQueue *_GuaTaskQueueCreate(void);
+GuaTask *_GuaQueueFirstElement(GuaTaskQueue *queue);
+void *_GuaThreadPoolThreadNew(void *);
+GuaTask *_GuaQueueDequeue(GuaTaskQueue *queue);
+void _GuaQueueEnqueue(GuaTaskQueue *queue, GuaTask *task);
+
+
+static pthread_mutex_t m;
+static pthread_cond_t cond;
+
+
+GuaTaskQueue *
+_GuaTaskQueueCreate(void) {
+    GuaTaskQueue *q = malloc(sizeof(GuaTaskQueue));
+    q->next = NULL;
+    q->length = 0;
+    q->tail = NULL;
+    return q;
+};
+
+GuaTask *
+_GuaQueueFirstElement(GuaTaskQueue *queue){
+    return queue->next;
+};
+
+GuaTask *
+_GuaQueueDequeue(GuaTaskQueue *queue) {
+    GuaTask *n = queue->next;
+    if (n->next == NULL) {
+        queue->next = NULL;
+        queue->tail = NULL;
+        queue->length = 0;
+    }else{
+        queue->next = n->next;
+        queue->length--;
+    }
+    return n;
+};
+
+void
+_GuaQueueEnqueue(GuaTaskQueue *queue, GuaTask *task) {
+    if (queue->tail == NULL) {
+        queue->next = task;
+    }else{
+        queue->tail->next = task;
+    }
+    queue->tail = task;
+    queue->length++;
+};
+
+GuaThreadPool*
+GuaThreadPoolNew(int numberOfThreads) {
+    GuaThreadPool *pool = malloc(sizeof(GuaThreadPool));
+    pool->numberOfThreads = numberOfThreads;
+    pthread_mutex_init(&m, NULL);
+    pthread_cond_init(&cond, NULL);
+    GuaTaskQueue *q = malloc(sizeof(GuaThreadPool));
+    q = _GuaTaskQueueCreate();
+    pool->queue = q;
+    pool->shutdown = 0;
+    pool->threads = malloc(numberOfThreads * sizeof (pthread_t));
+    for(int i = 0; i < numberOfThreads; i++){
+        pthread_create(&(pool->threads[i]), NULL, _GuaThreadPoolThreadNew, (void *)pool);
+    }
+    sleep(1);
+    return pool;
+};
+
+int
+GuaThreadPoolAddTask(GuaThreadPool *pool, GuaTaskCallback *callback, void *arg) {
+    GuaTask *newtask = malloc(sizeof(GuaTask));
+    newtask->callback = callback;
+    newtask->arg = arg;
+    newtask->next = NULL;
+    pthread_mutex_lock(&m);
+    _GuaQueueEnqueue(pool->queue, newtask);
+    pthread_mutex_unlock(&m);
+    pthread_cond_signal(&cond);
+    return 0;
+};
 
 // 线程池里面的单个线程的入口函数
 void *
 _GuaThreadPoolThreadNew(void *arg) {
     GuaThreadPool *pool = (GuaThreadPool *)arg;
     while(true){
-        pthread_mutex_lock(&(pool->mutex));
-        while(pool->cur_queue_size == 0 && pool->shutdown == 0){
+        pthread_mutex_lock(&m);
+        if(pool->queue->length == 0 && pool->shutdown == 0){
 //            printf("wait\n");
-            pthread_cond_wait (&(pool->cond), &(pool->mutex));
+            pthread_cond_wait(&cond, &m);
         }
-        if(pool->shutdown == 1 && pool->cur_queue_size == 0){
+        if(pool->queue->length == 0 && pool->shutdown == 1){
 //            printf("shut\n");
-            pthread_mutex_unlock(&(pool->mutex));
+            pthread_mutex_unlock(&m);
             pthread_exit(NULL);
+            return NULL;
         }
-//        assert(pool->cur_queue_size != 0);
-//        assert(pool->queue_head != NULL);
-        
-        pool->cur_queue_size--;
-        GuaTask *worker = pool->queue_head;
-        pool->queue_head = worker->next;
-        pthread_mutex_unlock(&(pool->mutex));
-        (*(worker->callback)) (worker->arg);
-        free (worker);
-        worker = NULL;
+        GuaTask *t = malloc(sizeof(GuaTask));
+//        printf("queue length: %d\n", pool->queue->length);
+        t = _GuaQueueDequeue(pool->queue);
+        pthread_mutex_unlock(&m);
+        (*(t->callback))(t->arg);
+        free(t);
+        t = NULL;
     }
     return NULL;
 };
-
-
-GuaThreadPool*
-GuaThreadPoolNew(int numberOfThreads) {
-    GuaThreadPool *pool = malloc(sizeof(GuaThreadPool));
-    pool->numberOfThreads = numberOfThreads;
-    pthread_mutex_init(&(pool->mutex), NULL);
-    pthread_cond_init(&(pool->cond), NULL);
-    pool->queue_head = NULL;
-    pool->cur_queue_size = 0;
-    pool->shutdown = 0;
-    pool->threads = malloc(numberOfThreads * sizeof (pthread_t));
-    for(int i = 0; i < numberOfThreads; i++){
-        pthread_create(&(pool->threads[i]), NULL, _GuaThreadPoolThreadNew, (void *)pool);
-    }
-    return pool;
-};
-
-
-int
-GuaThreadPoolAddTask(GuaThreadPool* pool, GuaTaskCallback * callback, void *arg) {
-    GuaTask *newworker = malloc(sizeof(GuaTask));
-    newworker->callback = callback;
-    newworker->arg = arg;
-    newworker->next = NULL;
-    pthread_mutex_lock(&(pool->mutex));
-    GuaTask *task = pool->queue_head;
-    if(task != NULL){
-        while(task->next != NULL){
-            task = task->next;
-        }
-        task->next = newworker;
-    }else{
-        pool->queue_head = newworker;
-    }
-//    assert(pool->queue_head != NULL);
-    pool->cur_queue_size++;
-    pthread_mutex_unlock(&(pool->mutex));
-    pthread_cond_signal(&(pool->cond));
-    return 0;
-};
-
 
 int
 GuaThreadPoolFree(GuaThreadPool *pool) {
@@ -126,18 +156,11 @@ GuaThreadPoolFree(GuaThreadPool *pool) {
     for(int i = 0; i < pool->numberOfThreads; i++){
         pthread_join(pool->threads[i], NULL);
     }
-    pthread_cond_broadcast(&(pool->cond));
+//    pthread_cond_broadcast(&cond);
     free(pool->threads);
-    GuaTask *head = NULL;
-    while(pool->queue_head != NULL){
-        head = pool->queue_head;
-        pool->queue_head = pool->queue_head->next;
-        free (head);
-    }
-    pthread_mutex_destroy(&(pool->mutex));
-    pthread_cond_destroy(&(pool->cond));
+    pthread_mutex_destroy(&m);
+    pthread_cond_destroy(&cond);
     free(pool);
     pool = NULL;
     return 0;
 };
-
