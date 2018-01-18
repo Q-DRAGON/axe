@@ -1,3 +1,4 @@
+# coding=utf-8
 """
 1, 用 py 的多线程模块 threading 实现一个多线程程序
     发送 3000 个 socket 请求到 localhost:3000 并接受响应
@@ -21,7 +22,7 @@ def send_socket():
 
 def main():
     threads = []
-    for i in range(3000):
+    for i in range(1000):
         t = threading.Thread(target=send_socket, name=str(i))
         threads.append(t)
         t.start()
