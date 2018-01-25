@@ -2,6 +2,8 @@
 #include <SDL2/SDL.h>
 
 #include "button.h"
+
+
 // interface
 // 声明 结构名, 类型
 struct ViewStruct;
@@ -10,7 +12,7 @@ struct GuaNodeStruct;
 typedef struct GuaNodeStruct GuaNode;
 struct GuaListStruct;
 typedef struct GuaListStruct GuaList;
-typedef int type;
+
 
 GuaList *
 GuaListCreate(ButtonStruct *button, int numberOfElements);

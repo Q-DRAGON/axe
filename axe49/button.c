@@ -6,13 +6,15 @@
 #include "button.h"
 #include "view.h"
 
+
 struct ButtonStruct {
     int x;
     int y;
     int w;
     int h;
-    GuaTaskCallback *action;
+    Callback *action;
 };
+
 
 int
 actionClick(void){
@@ -47,7 +49,7 @@ hasMouseIn(ButtonStruct *button, int x, int y){
 };
 
 int
-GuaButtonSetAction(ButtonStruct *button, GuaTaskCallback *actionClick){
+GuaButtonSetAction(ButtonStruct *button, Callback *actionClick){
     button->action = actionClick;
     return 0;
 };

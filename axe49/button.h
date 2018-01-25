@@ -1,6 +1,7 @@
 struct ButtonStruct;
 typedef struct ButtonStruct ButtonStruct;
-typedef void *(GuaTaskCallback)(void *);
+typedef void *(Callback)(void *);
+
 
 int
 actionClick(void);
@@ -12,7 +13,7 @@ int
 hasMouseIn(ButtonStruct *button, int x, int y);
 
 int
-GuaButtonSetAction(ButtonStruct *button, GuaTaskCallback *actionClick);
+GuaButtonSetAction(ButtonStruct *button, Callback *actionClick);
 
 int
 ButtonDraw(ButtonStruct *button);

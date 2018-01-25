@@ -4,16 +4,21 @@
 
 #include "view.h"
 
+
 // 结构的具体定义
 struct GuaNodeStruct {
     ButtonStruct *button;
     GuaNode *next;
 };
+
+
 struct GuaListStruct {
     int length;
     GuaNode *tail;
     GuaNode *next;
 };
+
+
 struct ViewStruct {
     char *name;
     int width;
@@ -21,8 +26,10 @@ struct ViewStruct {
     GuaList *viewlist;
 };
 
+
 static SDL_Window *window;
 static SDL_Renderer *renderer;
+
 
 GuaList *
 GuaListCreate(ButtonStruct *button, int numberOfElements) {
@@ -33,18 +40,6 @@ GuaListCreate(ButtonStruct *button, int numberOfElements) {
     list->next = NULL;
     list->tail = NULL;
     list->length = numberOfElements;
-    // 循环插入初始化元素
-    // for(int i = numberOfElements - 1; i >= 0; i--) {
-    //     GuaNode *n = malloc(sizeof(GuaNode));
-    //     n->button = button[i];
-    //     n->next = list->next;
-    //     //
-    //     list->next = n;
-    //     // 设置 tail
-    //     if (i == numberOfElements - 1) {
-    //         list->tail = n;
-    //     }
-    // }
     return list;
 }
 
@@ -65,7 +60,6 @@ GuaListAppend(GuaList *list, ButtonStruct *button) {
 void
 GuaListRemoveFirstElement(GuaList *list) {
     list->length--;
-    //
     GuaNode *n = list->next;
     list->next = n->next;
     free(n);
