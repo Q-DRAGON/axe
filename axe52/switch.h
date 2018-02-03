@@ -2,6 +2,7 @@
 #define __switch__
 
 
+#include <stdbool.h>
 #include "view.h"
 
 
@@ -10,10 +11,19 @@ typedef struct _SwitchStruct McSwitch;
 typedef void *(Callback)(void *);
 
 
-McLabel *
-McLabelNew(ViewStruct *view, char *inputtext);
+int
+actionSwitch(McSwitch *sw);
 
 int
-DrawLabel(void *label);
+hasMouseInSwitch(McSwitch *sw, int x, int y);
+
+int
+SwitchSetAction(McSwitch *sw, Callback *actionClick);
+
+McSwitch *
+McSwitchNew(ViewStruct *view);
+
+int
+DrawSwitch(void *sw);
 
 #endif

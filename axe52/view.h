@@ -51,6 +51,9 @@ int
 drawText(ViewStruct *v, int x, int y, char *text);
 
 int
+setDrawcolor(int r, int g, int b, int a);
+
+int
 draw(ViewStruct *view);
 
 int

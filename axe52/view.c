@@ -8,6 +8,7 @@
 #include "input.h"
 #include "label.h"
 #include "switch.h"
+#include "slider.h"
 
 
 struct _ViewStruct;
@@ -132,8 +133,17 @@ mouseHandler(SDL_Event event, ViewStruct *view){
     while (node != NULL) {
         ViewBase *v = (ViewBase *)node->element;
         if (v->action != NULL) {
-            ButtonStruct *vn = (ButtonStruct *)v;
-            hasMouseIn(vn, x, y);
+            if (v->individualDraw == (void *)DrawButton) {
+                ButtonStruct *vn = (ButtonStruct *)v;
+                hasMouseIn(vn, x, y);
+            }else if (v->individualDraw == (void *)DrawSwitch) {
+                McSwitch *sw = (McSwitch *)v;
+                hasMouseInSwitch(sw, x, y);
+                DrawSwitch(sw);
+            }else if (v->individualDraw == (void *)DrawSlider){
+                McSlider *sl = (McSlider *)v;
+                hasMouseInSlider(sl, x, y);
+            }
         }
         node = node->next;
     }
@@ -207,12 +217,18 @@ drawText(ViewStruct *v, int x, int y, char *text) {
 }
 
 int
+setDrawcolor(int r, int g, int b, int a){
+    SDL_SetRenderDrawColor(renderer, r, g, b, a);
+    return 0;
+}
+
+int
 draw(ViewStruct *view) {
     // 设置背景颜色并清除屏幕
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
     // 设置画笔颜色
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+    setDrawcolor(255, 255, 255, 255);
     GuaNode *node = view->viewlist->next;
     while (node != NULL) {
         ViewBase *v = (ViewBase *)node->element;
