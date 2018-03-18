@@ -1,0 +1,31 @@
+1，总时间 2.5 小时
+
+2，进度：Engineering: Networking, 1-4 to 1-5
+
+3，学习的内容有:
+Unit 1: The Internet and IP
+1-4: A day in the life of a packet
+    Transport layer: 3 way handshake
+        client->server: SYN
+        server->client:SYN-ACK
+        client->server:ACK
+    Network layer: delivering packets to computers (data sent to different aoolications on the same computer looks the same)
+    Transport layer: delivering data to applications
+    To open a TCP stream to another program need:
+        IP address (network layer, data to computer)
+        TCP port (transport layer, data to applications)
+    Tools:
+        Wireshark: to see TCP byte stream establishment and data exchange
+        Traceroute: to see route packets take through Internet
+
+1-5: The principle of packet switching
+    Packet:
+        A self-contained unit of data that carries information necessary for it to reach its destination.
+    Packet switching:
+        Independently for each arriving packet, pick its outgoing link. If the link is free, send it. Else hold the packet for later.
+    Self routing = source routing -> may have secure issues.
+    Nice properties of packet switching:
+        Simple packet forwarding.
+        Efficient sharing of links.
+
+4，掌握程度：完全理解。

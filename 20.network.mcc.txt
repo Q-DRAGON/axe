@@ -1,0 +1,28 @@
+1，总时间 2.5 小时
+
+2，进度：Engineering: Networking, 1-6 to 1-8
+
+3，学习的内容有:
+Unit 1: The Internet and IP
+1-6: The principle of layering
+    Reasons for layering
+        Modularity (more manageable)
+        Well defined service (to the layer above)
+        Reuse
+        Separation of concerns
+        Continuous improvement
+        peer-to-peer communications (specific to layered communication systems)
+
+1-7: The principle of encapsulation
+    Encaosulation: the principle unifies layering and packet.
+    Encapsulated payloads:
+        Help separation of concerns
+        Help enforce boundaries / layering
+        Simplify layer implementation
+    TLS
+
+1-8 Byte order and packet formats
+    Little endian: The least significant byte comes first.
+    Big endian: The most significant byte comes first.
+
+4，掌握程度：完全理解。

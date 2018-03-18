@@ -1,0 +1,31 @@
+1，总时间 3 小时
+
+2，进度：Engineering: Networking, 1-9 to 1-11
+
+3，学习的内容有:
+Unit 1: The Internet and IP
+1-9: IPv4 addresses and CIDR (Classless Inter-Domain Routing)
+    Netmask: consecutive 1s, starting with the most significant bit. Apply this mask, if it matches, in the same network. (If in the same network, the bits of 1s must be the same.)
+        255.255.255.0: if the first 24 bits match
+        255.255.252.0: if the first 22 bits match
+        255.128.0.0: if the first 9 bits match
+        Smaller netmask means bigger network.
+        If in the same network, can send data directly, otherwise through a router.
+    Classless Inter-Domain Routing (CIDR):
+        Oringinal address: network + host
+        New structured IPv4 address: CIDR, allowing prefixes to be any number of bits.
+        Address block is a pair: address, count.
+        When we talk about a CIDR address, we refer to its network lenghth.
+    How IPv4 addresses managed?
+        ICANN -> IANA (run out) -> RIRs
+
+1-10: Longest prefix match (LPM)
+    LPM: to select which link to forward a packet over.
+    Router: a forwarding table.
+
+1-11：Address resolution protocol (ARP)
+    To map a network layer address to its corresponding link layer address. (Because of encapsulation.)
+    A simple request-response protocol.
+
+
+4，掌握程度：完全理解。
