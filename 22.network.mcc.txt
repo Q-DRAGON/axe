@@ -1,0 +1,17 @@
+1，总时间 3 小时
+
+2，进度：Engineering: Networking, 1-12 to 1-11
+
+3，学习的内容有:
+Unit 1: The Internet and IP
+1-12: The Internet and IP (recap)
+    The summary.
+
+1-13: SIP
+    Interview.
+
+Unit 2: Transport
+2-0: Transport (intro)
+
+2-1：TCP service model
+    
