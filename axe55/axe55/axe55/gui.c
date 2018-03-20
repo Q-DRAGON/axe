@@ -19,7 +19,7 @@
 #include "lualib.h"
 #include "lauxlib.h"
 
-char *name = "axe53";
+char *name = "axe55";
 int width = 600;
 int height = 800;
 ViewStruct *view;
