@@ -43,7 +43,7 @@ API 自己拟定
 #include <stdlib.h>
 
 #include <SDL2/SDL.h>
-#include <SDL_ttf.h>
+#include <SDL2_ttf/SDL_ttf.h>
 
 static SDL_Window *window;
 static SDL_Renderer *renderer;

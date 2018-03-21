@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
-#include <SDL2/SDL.h>
+#include <SDL2_ttf/SDL_ttf.h>
 
 #include "button.h"
 #include "view.h"

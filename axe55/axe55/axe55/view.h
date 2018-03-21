@@ -2,7 +2,7 @@
 #define __view__
 #include <stdbool.h>
 #include <SDL2/SDL.h>
-#include <SDL_ttf.h>
+#include <SDL2_ttf/SDL_ttf.h>
 
 #include "lua.h"
 #include "lualib.h"
