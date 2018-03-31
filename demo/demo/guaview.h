@@ -69,7 +69,7 @@ struct _GuaView {
     SDL_Renderer *renderer;
     
     // 每个控件的额外数据放这里
-    GuaView *data;
+    void *data;
 };
 
 

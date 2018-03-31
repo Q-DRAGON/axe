@@ -22,5 +22,10 @@ struct _GuaEvent {
     int y;
 };
 
+//GuaMouseStatePress
+//GuaMouseStateRelease
+//GuamousestateMotion
+//
+//onMouse(GuaMouseState state, int x, int y)
 
 #endif
