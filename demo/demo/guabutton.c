@@ -4,18 +4,6 @@
 #include "guabutton.h"
 
 
-// 这个用于存储 button 的信息
-// 比如当前的状态之类的
-struct _GuaButtonData;
-typedef struct _GuaButtonData GuaButtonData;
-struct _GuaButtonData {
-    char *title;
-    bool pressed;
-    GuaColor colorPressed;
-    GuaButtonAction action;
-};
-
-
 static int
 _draw(GuaButton *button) {
     GuaButton *view = button;
@@ -68,7 +56,7 @@ GuaButtonCreate(GuaRect frame) {
     b->draw = _draw;
     b->onEvent = _onEvent;
     // 按钮的自定义属性设置
-    GuaButtonData *data = malloc(sizeof(GuaButton));
+    GuaButtonData *data = malloc(sizeof(GuaButtonData));
     data->title = NULL;
     data->pressed = false;
     data->colorPressed = (GuaColor){

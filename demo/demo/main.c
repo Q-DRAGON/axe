@@ -19,32 +19,77 @@ buttonPressed(GuaButton *button) {
 }
 
 int
-main(int argc, const char *argv[]) {
-    GuaView *rootView = GuaGuiInit();
-    
-    GuaRect frame = {
-        110, 0,
-        100, 100,
+_drawButtons(GuaView *rootView){
+    int bmih = 45;
+    int kshh = 2.5;
+
+    GuaRect framebutton1 = {
+        0 + kshh, 0 + kshh,
+        bmih, bmih,
     };
-    GuaView *v = GuaViewCreate(frame);
+    GuaButton *b1 = GuaButtonCreate(framebutton1);
+    GuaViewAdd(rootView, b1);
+    b1->backgroundColor = (GuaColor){
+        0, 0, 255, 255,
+    };
+    GuaButtonSetAction(b1, buttonPressed);
+    
+    GuaRect framebutton2 = {
+        bmih + 3 * kshh, 0 + kshh,
+        bmih, bmih,
+    };
+    
+    GuaButton *b2 = GuaButtonCreate(framebutton2);
+    GuaViewAdd(rootView, b2);
+    b2->backgroundColor = (GuaColor){
+        0, 0, 255, 255,
+    };
+    GuaButtonSetAction(b2, buttonPressed);
+    
+    GuaRect framebutton3 = {
+        0 + kshh, bmih + 3 * kshh,
+        bmih, bmih,
+    };
+    GuaButton *b3 = GuaButtonCreate(framebutton3);
+    GuaViewAdd(rootView, b3);
+    b3->backgroundColor = (GuaColor){
+        0, 0, 255, 255,
+    };
+    GuaButtonSetAction(b3, buttonPressed);
+    
+    GuaRect framebutton4 = {
+        bmih + 3 * kshh, bmih + 3 * kshh,
+        bmih, bmih,
+    };
+    GuaButton *b4 = GuaButtonCreate(framebutton4);
+    GuaViewAdd(rootView, b4);
+    b4->backgroundColor = (GuaColor){
+        0, 0, 255, 255,
+    };
+    GuaButtonSetAction(b4, buttonPressed);
+    
+    return 0;
+}
+
+int
+main(int argc, const char *argv[]) {
+    int canvaswidth = 400;
+    int canvasheight = 300;
+    
+    GuaView *rootView = GuaGuiInit(canvaswidth, canvasheight);
+    
+    GuaRect framecanvas = {
+        100, 0,
+        canvaswidth, canvasheight,
+    };
+    GuaView *v = GuaViewCreate(framecanvas);
     GuaViewAdd(rootView, v);
     v->onEvent = on;
     v->backgroundColor = (GuaColor){
-        255, 0, 0, 255,
+        0, 0, 0, 0,
     };
-
-
-    GuaRect frame1 = {
-        50, 50,
-        50, 50,
-    };
-    GuaButton *b = GuaButtonCreate(frame1);
-    GuaViewAdd(v, b);
-    b->backgroundColor = (GuaColor){
-        0, 255, 0, 255,
-    };
-    GuaButtonSetAction(b, buttonPressed);
-
+    
+    _drawButtons(rootView);
 
     // GUI run loop
     GuaGuiRun();

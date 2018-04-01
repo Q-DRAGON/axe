@@ -1,5 +1,5 @@
-#include <SDL2/SDL.h>
-#include <SDL2_ttf/SDL_ttf.h>
+//#include <SDL2/SDL.h>
+//#include <SDL2_ttf/SDL_ttf.h>
 
 #include "guaview.h"
 
@@ -15,7 +15,7 @@ GuaRectContainsPoint(GuaRect rect, GuaVector2 point) {
     return contains;
 }
 
-
+//画矩形view
 static int
 _draw(GuaView *view) {
     SDL_Rect rect = {
@@ -108,6 +108,7 @@ GuaViewAdd(GuaView *parent, GuaView *view) {
 //    printf("view add %d %d", x, y);
     if(parent->children == NULL) {
         parent->children = view;
+        view->prev = parent;
     } else {
         GuaView *v = parent->children;
         while (v->next != NULL) {

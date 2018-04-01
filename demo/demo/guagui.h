@@ -9,7 +9,7 @@
 
 
 GuaView *
-GuaGuiInit(void);
+GuaGuiInit(int canvasw, int canvash);
 
 int
 GuaGuiRun(void);

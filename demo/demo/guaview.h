@@ -31,8 +31,6 @@ struct _GuaRect {
     int h;
 };
 
-bool GuaRectContainsPoint(GuaRect rect, GuaVector2 point);
-
 
 struct _GuaColor;
 typedef struct _GuaColor GuaColor;

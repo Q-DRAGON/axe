@@ -24,7 +24,7 @@ struct _GuaEvent {
 
 //GuaMouseStatePress
 //GuaMouseStateRelease
-//GuamousestateMotion
+//GuaMouseStateMotion
 //
 //onMouse(GuaMouseState state, int x, int y)
 
