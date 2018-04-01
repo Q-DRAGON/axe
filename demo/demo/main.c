@@ -7,12 +7,6 @@
 #include "guabutton.h"
 
 
-static int
-on(GuaView *v, GuaEvent event) {
-    printf("on event in v\n");
-    return 0;
-}
-
 static void
 buttonPressed(GuaButton *button) {
     printf("button pressed\n");
@@ -30,7 +24,7 @@ _drawButtons(GuaView *rootView){
     GuaButton *b1 = GuaButtonCreate(framebutton1);
     GuaViewAdd(rootView, b1);
     b1->backgroundColor = (GuaColor){
-        0, 0, 255, 255,
+        255, 192, 203, 255,
     };
     GuaButtonSetAction(b1, buttonPressed);
     
@@ -42,7 +36,7 @@ _drawButtons(GuaView *rootView){
     GuaButton *b2 = GuaButtonCreate(framebutton2);
     GuaViewAdd(rootView, b2);
     b2->backgroundColor = (GuaColor){
-        0, 0, 255, 255,
+        142, 112, 219, 255,
     };
     GuaButtonSetAction(b2, buttonPressed);
     
@@ -53,7 +47,7 @@ _drawButtons(GuaView *rootView){
     GuaButton *b3 = GuaButtonCreate(framebutton3);
     GuaViewAdd(rootView, b3);
     b3->backgroundColor = (GuaColor){
-        0, 0, 255, 255,
+        100, 149, 237, 255,
     };
     GuaButtonSetAction(b3, buttonPressed);
     
@@ -64,7 +58,7 @@ _drawButtons(GuaView *rootView){
     GuaButton *b4 = GuaButtonCreate(framebutton4);
     GuaViewAdd(rootView, b4);
     b4->backgroundColor = (GuaColor){
-        0, 0, 255, 255,
+        244, 164, 96, 255,
     };
     GuaButtonSetAction(b4, buttonPressed);
     
@@ -76,7 +70,7 @@ main(int argc, const char *argv[]) {
     int canvaswidth = 400;
     int canvasheight = 300;
     
-    GuaView *rootView = GuaGuiInit(canvaswidth, canvasheight);
+    GuaView *rootView = GuaGuiInit();
     
     GuaRect framecanvas = {
         100, 0,
@@ -84,6 +78,7 @@ main(int argc, const char *argv[]) {
     };
     GuaView *v = GuaViewCreate(framecanvas);
     GuaViewAdd(rootView, v);
+    v->draw = drawPixels;
     v->onEvent = on;
     v->backgroundColor = (GuaColor){
         0, 0, 0, 0,
@@ -92,7 +87,7 @@ main(int argc, const char *argv[]) {
     _drawButtons(rootView);
 
     // GUI run loop
-    GuaGuiRun();
+    GuaGuiRun(rootView);
     
     return 0;
 }

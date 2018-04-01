@@ -14,20 +14,17 @@
 
 static SDL_Window *window;
 static SDL_Renderer *renderer;
-static lua_State *L;
 static TTF_Font *font;
-//static SDL_Texture *texture;
-static Uint32 pixels;
-
 static GuaView *rootView = NULL;
 
 
 GuaView *
-GuaGuiInit(int canvasw, int canvash) {
-    // 初始化 SDL
-    SDL_Init(SDL_INIT_VIDEO);
+GuaGuiInit(void) {
     int width = 800;
     int height = 600;
+    // 初始化 SDL
+    SDL_Init(SDL_INIT_VIDEO);
+    
     // 创建窗口
     // 窗口标题 窗口x 窗口y 宽 高 额外参数
     window = SDL_CreateWindow(
@@ -46,20 +43,10 @@ GuaGuiInit(int canvasw, int canvash) {
                                   -1,
                                   SDL_RENDERER_ACCELERATED
                                   );
-    //But then, rather than creating a texture from a surface, we're now going to create one from scratch using SDL_CreateTexture()
-    //参考资料：http://programmersranch.blogspot.com/2014/02/sdl2-pixel-drawing.html
-//    texture = SDL_CreateTexture(
-//                                renderer,
-//                                SDL_PIXELFORMAT_ARGB8888,
-//                                SDL_TEXTUREACCESS_STATIC,
-//                                canvasw,
-//                                canvash
-//                                );
     
-    Uint32 pixels[canvasw * canvash];
     // init lua
-//    L = luaL_newstate();
-//    luaL_openlibs(L);
+    //    L = luaL_newstate();
+    //    luaL_openlibs(L);
     // init font
     const char *fontPath = "OpenSans-Regular.ttf";
     // 打开字体 参数是 fontpath and fontsize
@@ -76,15 +63,12 @@ GuaGuiInit(int canvasw, int canvash) {
     return rootView;
 }
 
-
 void
 GuaGuiClose(void) {
 //    lua_close(L);
     TTF_Quit();
-    //We’ll need to clean up all the stuff we just allocated, so add the following just before the other cleanup calls at the end of the code
-//    SDL_DestroyTexture(texture);
-//    SDL_DestroyRenderer(renderer);
     
+//    SDL_DestroyTexture(texture);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();
@@ -99,7 +83,6 @@ _onKey(SDL_Event event) {
 
 static void
 _onMouse(SDL_Event event) {
-//    printf("on mouse\n");
     GuaEvent e;
     e.type = 1;
     if (event.type == SDL_MOUSEBUTTONDOWN) {
@@ -145,8 +128,6 @@ _draw(void) {
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
     
-//    SDL_RenderCopy(renderer, texture, NULL, NULL);
-    
     // 设置画笔颜色
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
     
@@ -160,9 +141,10 @@ _draw(void) {
 }
 
 int
-GuaGuiRun() {
+GuaGuiRun(GuaView *view) {
+    
     while(true) {
-//        SDL_UpdateTexture(texture, NULL, pixels, 400 * sizeof(Uint32));
+//        SDL_UpdateTexture(texture, NULL, view->pixels, 800 * sizeof(int));
         
         // 更新输入
         _updateInput();
@@ -174,4 +156,3 @@ GuaGuiRun() {
     
     return 0;
 }
-

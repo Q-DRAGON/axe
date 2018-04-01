@@ -13,14 +13,12 @@
 struct _GuaView;
 typedef struct _GuaView GuaView;
 
-
 struct _GuaVector2;
 typedef struct _GuaVector2 GuaVector2;
 struct _GuaVector2 {
     int x;
     int y;
 };
-
 
 struct _GuaRect;
 typedef struct _GuaRect GuaRect;
@@ -31,7 +29,6 @@ struct _GuaRect {
     int h;
 };
 
-
 struct _GuaColor;
 typedef struct _GuaColor GuaColor;
 struct _GuaColor {
@@ -40,7 +37,6 @@ struct _GuaColor {
     int b;
     int a;
 };
-
 
 // 回调定义
 // TODO, GuaEvent
@@ -65,15 +61,25 @@ struct _GuaView {
     
     // 暂时放一个全局的变量在每个 view 中
     SDL_Renderer *renderer;
+    SDL_Texture *texture;
     
     // 每个控件的额外数据放这里
     void *data;
+    Uint32 *pixels;
+    
+    bool pressed;
+    
 };
 
+
+int
+on(GuaView *v, GuaEvent event);
 
 GuaView *
 GuaViewCreate(GuaRect frame);
 
+int
+drawPixels(GuaView *view);
 
 void
 GuaViewAdd(GuaView *parent, GuaView *view);
@@ -89,6 +95,5 @@ GuaViewRemove(GuaView *view);
 
 void
 GuaViewOnEvent(GuaView *view, GuaEvent event);
-
 
 #endif

@@ -1,8 +1,19 @@
 //#include <SDL2/SDL.h>
 //#include <SDL2_ttf/SDL_ttf.h>
-
 #include "guaview.h"
 
+
+int
+on(GuaView *v, GuaEvent event) {
+    int mouseX = event.x;
+    int mouseY = event.y;
+//    printf("%d %d %d %d", event.x, event.y, v->offset.x, v->offset.y);
+    Uint32 *pixels[v->frame.w * v->frame.h];
+    pixels[mouseY * 200 + mouseX / 2 - 10] = 0;
+    v->pixels = *pixels;
+//    printf("on event in v\n");
+    return 0;
+}
 
 bool
 GuaRectContainsPoint(GuaRect rect, GuaVector2 point) {
@@ -29,9 +40,35 @@ _draw(GuaView *view) {
                            view->backgroundColor.r,
                            view->backgroundColor.g,
                            view->backgroundColor.b,
-                           view->backgroundColor.a);
+                           view->backgroundColor.a
+                           );
     SDL_RenderFillRect(view->renderer, &rect);
 
+    return 0;
+}
+
+int
+drawPixels(GuaView *view){
+    SDL_Texture *texture = SDL_CreateTexture(
+                                             view->renderer,
+                                             SDL_PIXELFORMAT_ARGB8888,
+                                             SDL_TEXTUREACCESS_STATIC,
+                                             view->frame.w,
+                                             view->frame.h
+                                             );
+    Uint32 *pixels[view->frame.w * view->frame.h];
+    
+    SDL_Rect rect = {
+        view->offset.x,
+        view->offset.y,
+        view->frame.w,
+        view->frame.h,
+    };
+    
+    *pixels = view->pixels;
+    SDL_UpdateTexture(texture, NULL, pixels, view->frame.w * sizeof(Uint32));
+    SDL_RenderCopy(view->renderer, texture, NULL, &rect);
+    SDL_DestroyTexture(texture);
     return 0;
 }
 
@@ -63,7 +100,17 @@ GuaViewOnEvent(GuaView *view, GuaEvent event) {
         };
         if (GuaRectContainsPoint(frame, point)) {
             if (view->onEvent != NULL) {
-                view->onEvent(view, event);
+                if (event.state == 1) {
+                    view->pressed = true;
+                    view->onEvent(view, event);
+                } else if (event.state == 3) {
+                    printf("%d\n", view->pressed);
+                    if (view->pressed == true) {
+                        view->onEvent(view, event);
+                    };
+                } else if (event.state == 2) {
+                    view->pressed = false;
+                }
             }
             GuaView *v = view->children;
             while (v != NULL) {
@@ -83,7 +130,7 @@ GuaViewCreate(GuaRect frame) {
     v->draw = _draw;
     v->onEvent = NULL;
 
-    v->backgroundColor = (GuaColor){255, 255, 255, 255};
+    v->backgroundColor = (GuaColor){255, 236, 139, 255};
     
     v->parent = NULL;
     v->children = NULL;
@@ -91,7 +138,12 @@ GuaViewCreate(GuaRect frame) {
     v->prev = NULL;
 
     v->data = NULL;
-
+    
+    v->pixels = NULL;
+    Uint32 *pixels[v->frame.w * v->frame.h];
+    memset(pixels, 255, v->frame.w * v->frame.h * sizeof(Uint32));
+    v->pixels = *pixels;
+    v->pressed = false;
     return v;
 }
 

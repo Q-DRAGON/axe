@@ -9,13 +9,12 @@
 
 
 GuaView *
-GuaGuiInit(int canvasw, int canvash);
+GuaGuiInit(void);
 
 int
-GuaGuiRun(void);
+GuaGuiRun(GuaView *view);
 
 void
 GuaGuiClose(void);
-
 
 #endif
