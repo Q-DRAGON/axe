@@ -2,7 +2,6 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-#include <SDL2_image/SDL_image.h>
 #include "guagui.h"
 #include "guaview.h"
 #include "guabutton.h"
@@ -33,7 +32,6 @@ _drawButtons(GuaView *rootView){
         bmih + 3 * kshh, 0 + kshh,
         bmih, bmih,
     };
-    
     GuaButton *b2 = GuaButtonCreate(framebutton2);
     GuaViewAdd(rootView, b2);
     b2->backgroundColor = (GuaColor){

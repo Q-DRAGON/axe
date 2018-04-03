@@ -1,5 +1,6 @@
 #include <stdbool.h>
 #include <string.h>
+#include <SDL2_image/SDL_image.h>
 
 #include "guabutton.h"
 
@@ -27,6 +28,14 @@ _draw(GuaButton *button) {
                            color.b,
                            color.a);
     SDL_RenderFillRect(view->renderer, &rect);
+    
+    // 画图片
+    SDL_Rect penrect = { 2.5, 0, 45, 45 };
+    SDL_Surface *imagepen;
+    SDL_Texture *texturepen;
+    imagepen = IMG_Load("/Users/yuki/ff/git-axe/demo/demo/images/pen.png");
+    texturepen = SDL_CreateTextureFromSurface(view->renderer, imagepen);
+    SDL_RenderCopy(view->renderer, texturepen, NULL, &penrect);
 
     return 0;
 }

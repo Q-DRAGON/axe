@@ -16,6 +16,8 @@ static SDL_Window *window;
 static SDL_Renderer *renderer;
 static TTF_Font *font;
 static GuaView *rootView = NULL;
+static SDL_Surface *imagepen;
+static SDL_Texture *texturepen;
 
 
 GuaView *
@@ -24,7 +26,7 @@ GuaGuiInit(void) {
     int height = 600;
     // 初始化 SDL
     SDL_Init(SDL_INIT_VIDEO);
-    
+//    SDL_Init(SDL_INIT_EVERYTHING);
     // 创建窗口
     // 窗口标题 窗口x 窗口y 宽 高 额外参数
     window = SDL_CreateWindow(
@@ -43,7 +45,8 @@ GuaGuiInit(void) {
                                   -1,
                                   SDL_RENDERER_ACCELERATED
                                   );
-    
+//    imagepen = SDL_LoadBMP("/Users/yuki/ff/git-axe/demo/demo/images/pen.bmp");
+//    texturepen = SDL_CreateTextureFromSurface(renderer, imagepen);
     // init lua
     //    L = luaL_newstate();
     //    luaL_openlibs(L);
@@ -67,7 +70,8 @@ void
 GuaGuiClose(void) {
 //    lua_close(L);
     TTF_Quit();
-    
+    SDL_DestroyTexture(texturepen);
+    SDL_FreeSurface(imagepen);
 //    SDL_DestroyTexture(texture);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);

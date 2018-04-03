@@ -47,6 +47,7 @@ _draw(GuaView *view) {
     return 0;
 }
 
+//画笔画线的过程
 int
 drawPixels(GuaView *view){
     SDL_Texture *texture = SDL_CreateTexture(
