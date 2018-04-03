@@ -104,7 +104,7 @@ GuaViewOnEvent(GuaView *view, GuaEvent event) {
                     view->pressed = true;
                     view->onEvent(view, event);
                 } else if (event.state == 3) {
-                    printf("%d\n", view->pressed);
+//                    printf("%d\n", view->pressed);
                     if (view->pressed == true) {
                         view->onEvent(view, event);
                     };

@@ -2,6 +2,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+#include <SDL2_image/SDL_image.h>
 #include "guagui.h"
 #include "guaview.h"
 #include "guabutton.h"
