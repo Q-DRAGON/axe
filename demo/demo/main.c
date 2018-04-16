@@ -16,7 +16,14 @@ int
 _drawButtons(GuaView *rootView){
     int bmih = 45;
     int kshh = 2.5;
-
+    
+    char *imgpressed = "/Users/yuki/ff/git-axe/demo/demo/images/pressed.png";
+    char *imgpen = "/Users/yuki/ff/git-axe/demo/demo/images/pen.png";
+    char *imgline = "/Users/yuki/ff/git-axe/demo/demo/images/line.png";
+    char *imgrect = "/Users/yuki/ff/git-axe/demo/demo/images/rect.png";
+    char *imgrubber = "/Users/yuki/ff/git-axe/demo/demo/images/rubber.png";
+    
+    // 第一个按钮
     GuaRect framebutton1 = {
         0 + kshh, 0 + kshh,
         bmih, bmih,
@@ -27,7 +34,10 @@ _drawButtons(GuaView *rootView){
         255, 192, 203, 255,
     };
     GuaButtonSetAction(b1, buttonPressed);
+    GuaButtonInit(b1, imgpen, imgpressed);
     
+    
+    // 第二个按钮
     GuaRect framebutton2 = {
         bmih + 3 * kshh, 0 + kshh,
         bmih, bmih,
@@ -38,7 +48,9 @@ _drawButtons(GuaView *rootView){
         142, 112, 219, 255,
     };
     GuaButtonSetAction(b2, buttonPressed);
+    GuaButtonInit(b2, imgline, imgpressed);
     
+    // 第三个按钮
     GuaRect framebutton3 = {
         0 + kshh, bmih + 3 * kshh,
         bmih, bmih,
@@ -49,7 +61,9 @@ _drawButtons(GuaView *rootView){
         100, 149, 237, 255,
     };
     GuaButtonSetAction(b3, buttonPressed);
+    GuaButtonInit(b3, imgrect, imgpressed);
     
+    // 第四个按钮
     GuaRect framebutton4 = {
         bmih + 3 * kshh, bmih + 3 * kshh,
         bmih, bmih,
@@ -60,6 +74,7 @@ _drawButtons(GuaView *rootView){
         244, 164, 96, 255,
     };
     GuaButtonSetAction(b4, buttonPressed);
+    GuaButtonInit(b4, imgrubber, imgpressed);
     
     return 0;
 }

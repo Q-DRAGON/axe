@@ -4,6 +4,35 @@
 
 #include "guabutton.h"
 
+int
+GuaButtonSetImage(GuaButton *button, GuaImage *normal, GuaImage *active){
+    GuaRect penrect = button->frame;
+    SDL_Rect rect = { penrect.x, penrect.y, penrect.w, penrect.h};
+    if (button->pressed) {
+        SDL_RenderCopy(button->renderer, active->texturepen, NULL, &rect);
+    } else {
+        SDL_RenderCopy(button->renderer, normal->texturepen, NULL, &rect);
+    }
+    return 0;
+}
+
+GuaImage *
+GuaButtonImageCreate(GuaButton *view, GuaRect penrect, char *img){
+    GuaImage *i = malloc(sizeof(GuaImage));
+    SDL_Rect rect = { penrect.x, penrect.y, penrect.w, penrect.h};
+    i->penrect = rect;
+    i->imagepen = IMG_Load(img);
+    i->texturepen = SDL_CreateTextureFromSurface(view->renderer, i->imagepen);
+    return i;
+}
+
+int
+GuaButtonInit(GuaButton *b, char *img, char *imgpressed){
+    GuaButtonData *data = (GuaButtonData *)b->data;
+    data->img = img;
+    data->imgpressed = imgpressed;
+    return 0;
+}
 
 static int
 _draw(GuaButton *button) {
@@ -12,8 +41,8 @@ _draw(GuaButton *button) {
     GuaButtonData *data = (GuaButtonData *)button->data;
 
     SDL_Rect rect = {
-        view->offset.x,
-        view->offset.y,
+        view->frame.x,
+        view->frame.y,
         view->frame.w,
         view->frame.h,
     };
@@ -29,14 +58,15 @@ _draw(GuaButton *button) {
                            color.a);
     SDL_RenderFillRect(view->renderer, &rect);
     
-    // 画图片
-    SDL_Rect penrect = { 2.5, 0, 45, 45 };
-    SDL_Surface *imagepen;
-    SDL_Texture *texturepen;
-    imagepen = IMG_Load("/Users/yuki/ff/git-axe/demo/demo/images/pen.png");
-    texturepen = SDL_CreateTextureFromSurface(view->renderer, imagepen);
-    SDL_RenderCopy(view->renderer, texturepen, NULL, &penrect);
-
+    // 画按下的图片
+    char *imgpressed = data->imgpressed;
+    GuaImage *ipressed = GuaButtonImageCreate(view, view->frame, imgpressed);
+    // 画第一个按钮的图片
+    char *imgroute1 = data->img;
+    GuaImage *i1 = GuaButtonImageCreate(view, view->frame, imgroute1);
+    // 给第一个按钮做按下功能
+    GuaButtonSetImage(view, i1, ipressed);
+    
     return 0;
 }
 
@@ -47,10 +77,14 @@ _onEvent(GuaView *view, GuaEvent event) {
     // 有多种处理方式，具体哪种好，需要你自己的尝试
     GuaButton *button = (GuaButton *)view;
     GuaButtonData *data = (GuaButtonData *)button->data;
+    printf("type state %d %d", event.type, event.state);
     if (event.state == 1) {
         data->pressed = true;
-    } else if (event.state == 2) {
+        printf("true\n");
+    }
+    if (event.state == 2) {
         data->pressed = false;
+        printf("pressed-false\n");
         // 执行按钮事件
         if (data->action != NULL) {
             data->action(button);
@@ -72,6 +106,8 @@ GuaButtonCreate(GuaRect frame) {
         255, 255, 0, 255,
     };
     data->action = NULL;
+    data->img = NULL;
+    data->imgpressed = NULL;
     
     b->data = (void *)data;
     

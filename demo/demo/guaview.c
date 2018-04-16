@@ -9,7 +9,8 @@ on(GuaView *v, GuaEvent event) {
     int mouseY = event.y;
 //    printf("%d %d %d %d", event.x, event.y, v->offset.x, v->offset.y);
     Uint32 *pixels[v->frame.w * v->frame.h];
-    pixels[mouseY * 200 + mouseX / 2 - 10] = 0;
+    pixels[mouseY * 200 + mouseX / 2 - 15] = 0;
+//    pixels[(mouseY - 1) * 400 + mouseX] = 0;
     v->pixels = *pixels;
 //    printf("on event in v\n");
     return 0;
@@ -30,8 +31,8 @@ GuaRectContainsPoint(GuaRect rect, GuaVector2 point) {
 static int
 _draw(GuaView *view) {
     SDL_Rect rect = {
-        view->offset.x,
-        view->offset.y,
+        view->frame.x,
+        view->frame.y,
         view->frame.w,
         view->frame.h,
     };
@@ -94,8 +95,8 @@ GuaViewOnEvent(GuaView *view, GuaEvent event) {
             event.x, event.y,
         };
         GuaRect frame = (GuaRect){
-            view->offset.x,
-            view->offset.y,
+            view->frame.x,
+            view->frame.y,
             view->frame.w,
             view->frame.h,
         };
@@ -105,12 +106,12 @@ GuaViewOnEvent(GuaView *view, GuaEvent event) {
                     view->pressed = true;
                     view->onEvent(view, event);
                 } else if (event.state == 3) {
-//                    printf("%d\n", view->pressed);
                     if (view->pressed == true) {
                         view->onEvent(view, event);
                     };
                 } else if (event.state == 2) {
                     view->pressed = false;
+                    view->onEvent(view, event);
                 }
             }
             GuaView *v = view->children;

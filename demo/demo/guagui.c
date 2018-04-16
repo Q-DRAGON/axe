@@ -26,7 +26,7 @@ GuaGuiInit(void) {
     int height = 600;
     // 初始化 SDL
     SDL_Init(SDL_INIT_VIDEO);
-//    SDL_Init(SDL_INIT_EVERYTHING);
+    // SDL_Init(SDL_INIT_EVERYTHING);
     // 创建窗口
     // 窗口标题 窗口x 窗口y 宽 高 额外参数
     window = SDL_CreateWindow(
@@ -45,8 +45,8 @@ GuaGuiInit(void) {
                                   -1,
                                   SDL_RENDERER_ACCELERATED
                                   );
-//    imagepen = SDL_LoadBMP("/Users/yuki/ff/git-axe/demo/demo/images/pen.bmp");
-//    texturepen = SDL_CreateTextureFromSurface(renderer, imagepen);
+    // imagepen = SDL_LoadBMP("/Users/yuki/ff/git-axe/demo/demo/images/pen.bmp");
+    // texturepen = SDL_CreateTextureFromSurface(renderer, imagepen);
     // init lua
     //    L = luaL_newstate();
     //    luaL_openlibs(L);
@@ -148,8 +148,6 @@ int
 GuaGuiRun(GuaView *view) {
     
     while(true) {
-//        SDL_UpdateTexture(texture, NULL, view->pixels, 800 * sizeof(int));
-        
         // 更新输入
         _updateInput();
         
