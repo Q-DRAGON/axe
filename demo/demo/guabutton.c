@@ -7,8 +7,9 @@
 int
 GuaButtonSetImage(GuaButton *button, GuaImage *normal, GuaImage *active){
     GuaRect penrect = button->frame;
+    GuaButtonData *data = button->data;
     SDL_Rect rect = { penrect.x, penrect.y, penrect.w, penrect.h};
-    if (button->pressed) {
+    if (data->pressed) {
         SDL_RenderCopy(button->renderer, active->texturepen, NULL, &rect);
     } else {
         SDL_RenderCopy(button->renderer, normal->texturepen, NULL, &rect);
@@ -58,13 +59,13 @@ _draw(GuaButton *button) {
                            color.a);
     SDL_RenderFillRect(view->renderer, &rect);
     
-    // 画按下的图片
+    // 画当前按钮按下的图片
     char *imgpressed = data->imgpressed;
     GuaImage *ipressed = GuaButtonImageCreate(view, view->frame, imgpressed);
-    // 画第一个按钮的图片
+    // 画当前按钮的图片
     char *imgroute1 = data->img;
     GuaImage *i1 = GuaButtonImageCreate(view, view->frame, imgroute1);
-    // 给第一个按钮做按下功能
+    // 给当前按钮做按下功能
     GuaButtonSetImage(view, i1, ipressed);
     
     return 0;
@@ -77,19 +78,26 @@ _onEvent(GuaView *view, GuaEvent event) {
     // 有多种处理方式，具体哪种好，需要你自己的尝试
     GuaButton *button = (GuaButton *)view;
     GuaButtonData *data = (GuaButtonData *)button->data;
-    printf("type state %d %d", event.type, event.state);
+    // printf("type state %d %d", event.type, event.state);
     if (event.state == 1) {
-        data->pressed = true;
-        printf("true\n");
-    }
-    if (event.state == 2) {
-        data->pressed = false;
-        printf("pressed-false\n");
-        // 执行按钮事件
+        if (data->pressed == true) {
+            data->pressed = false;
+        } else if (data->pressed == false) {
+            data->pressed = true;
+        }
         if (data->action != NULL) {
             data->action(button);
         }
+//        printf("true\n");
     }
+//    if (event.state == 2) {
+//        data->pressed = false;
+//        // printf("pressed-false\n");
+//        // 执行按钮事件
+//        if (data->action != NULL) {
+//            data->action(button);
+//        }
+//    }
     return 0;
 }
 
