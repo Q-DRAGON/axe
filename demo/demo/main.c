@@ -29,6 +29,7 @@ _drawButtons(GuaView *rootView){
         bmih, bmih,
     };
     GuaButton *b1 = GuaButtonCreate(framebutton1);
+    b1->name = "pen";
     GuaViewAdd(rootView, b1);
     b1->backgroundColor = (GuaColor){
         255, 192, 203, 255,
@@ -43,6 +44,7 @@ _drawButtons(GuaView *rootView){
         bmih, bmih,
     };
     GuaButton *b2 = GuaButtonCreate(framebutton2);
+    b2->name = "line";
     GuaViewAdd(rootView, b2);
     b2->backgroundColor = (GuaColor){
         142, 112, 219, 255,
@@ -56,6 +58,7 @@ _drawButtons(GuaView *rootView){
         bmih, bmih,
     };
     GuaButton *b3 = GuaButtonCreate(framebutton3);
+    b3->name = "rect";
     GuaViewAdd(rootView, b3);
     b3->backgroundColor = (GuaColor){
         100, 149, 237, 255,
@@ -69,6 +72,7 @@ _drawButtons(GuaView *rootView){
         bmih, bmih,
     };
     GuaButton *b4 = GuaButtonCreate(framebutton4);
+    b4->name = "rubber";
     GuaViewAdd(rootView, b4);
     b4->backgroundColor = (GuaColor){
         244, 164, 96, 255,

@@ -146,6 +146,8 @@ GuaViewCreate(GuaRect frame) {
     memset(pixels, 255, v->frame.w * v->frame.h * sizeof(Uint32));
     v->pixels = *pixels;
     v->pressed = false;
+    v->name = NULL;
+    v->buttonpressed = NULL;
     return v;
 }
 

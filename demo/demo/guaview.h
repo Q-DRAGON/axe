@@ -68,6 +68,8 @@ struct _GuaView {
     Uint32 *pixels;
     
     bool pressed;
+    char *name;
+    char *buttonpressed;
     
 };
 

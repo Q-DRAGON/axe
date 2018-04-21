@@ -62,6 +62,7 @@ GuaGuiInit(void) {
     };
     rootView = GuaViewCreate(frame);
     rootView->renderer = renderer;
+    rootView->name = "rootview";
     
     return rootView;
 }

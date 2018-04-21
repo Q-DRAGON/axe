@@ -7,9 +7,10 @@
 int
 GuaButtonSetImage(GuaButton *button, GuaImage *normal, GuaImage *active){
     GuaRect penrect = button->frame;
-    GuaButtonData *data = button->data;
+//    GuaButtonData *data = button->data;
     SDL_Rect rect = { penrect.x, penrect.y, penrect.w, penrect.h};
-    if (data->pressed) {
+    GuaView *p = button->parent;
+    if (p->buttonpressed == button->name) {
         SDL_RenderCopy(button->renderer, active->texturepen, NULL, &rect);
     } else {
         SDL_RenderCopy(button->renderer, normal->texturepen, NULL, &rect);
@@ -78,13 +79,20 @@ _onEvent(GuaView *view, GuaEvent event) {
     // 有多种处理方式，具体哪种好，需要你自己的尝试
     GuaButton *button = (GuaButton *)view;
     GuaButtonData *data = (GuaButtonData *)button->data;
+//    GuaView *p = button->parent;
     // printf("type state %d %d", event.type, event.state);
     if (event.state == 1) {
-        if (data->pressed == true) {
-            data->pressed = false;
-        } else if (data->pressed == false) {
-            data->pressed = true;
+//        if (data->pressed == true) {
+//            data->pressed = false;
+//        } else if (data->pressed == false) {
+//            data->pressed = true;
+//        }
+        if (button->parent->buttonpressed == button->name) {
+            button->parent->buttonpressed = NULL;
+        } else {
+            button->parent->buttonpressed = button->name;
         }
+        
         if (data->action != NULL) {
             data->action(button);
         }
