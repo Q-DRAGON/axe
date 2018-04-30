@@ -3,16 +3,25 @@
 #include "guaview.h"
 
 
+// 当画笔按下时，view 的 onEvent 是 drawpix
 int
-on(GuaView *v, GuaEvent event) {
+drawpix(GuaView *v, GuaEvent event) {
     int mouseX = event.x;
     int mouseY = event.y;
-//    printf("%d %d %d %d", event.x, event.y, v->offset.x, v->offset.y);
     Uint32 *pixels[v->frame.w * v->frame.h];
-    pixels[mouseY * 200 + mouseX / 2 - 15] = 0;
-//    pixels[(mouseY - 1) * 400 + mouseX] = 0;
+    pixels[mouseY * 200 + mouseX / 2 - 8] = 0;
     v->pixels = *pixels;
-//    printf("on event in v\n");
+    return 0;
+}
+
+// 当矩形按下时，view 的 onEvent 是 drawtrangle
+int
+drawtrangle(GuaView *v, GuaEvent event) {
+    int mouseX = event.x;
+    int mouseY = event.y;
+    Uint32 *pixels[v->frame.w * v->frame.h];
+    pixels[mouseY * 200 + mouseX / 2 - 8] = 0;
+    v->pixels = *pixels;
     return 0;
 }
 
@@ -61,8 +70,8 @@ drawPixels(GuaView *view){
     Uint32 *pixels[view->frame.w * view->frame.h];
     
     SDL_Rect rect = {
-        view->offset.x,
-        view->offset.y,
+        view->frame.x,
+        view->frame.y,
         view->frame.w,
         view->frame.h,
     };
@@ -128,10 +137,11 @@ GuaView *
 GuaViewCreate(GuaRect frame) {
     GuaView *v = malloc(sizeof(GuaView));
     v->frame = frame;
-    v->offset = (GuaVector2){0, 0};
+    v->offset = (GuaVector2){frame.x, frame.y};
     v->draw = _draw;
     v->onEvent = NULL;
-
+    
+    // 所有 view 的背景色
     v->backgroundColor = (GuaColor){255, 236, 139, 255};
     
     v->parent = NULL;

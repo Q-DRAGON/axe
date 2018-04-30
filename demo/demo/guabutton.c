@@ -66,7 +66,7 @@ _draw(GuaButton *button) {
     // 画当前按钮的图片
     char *imgroute1 = data->img;
     GuaImage *i1 = GuaButtonImageCreate(view, view->frame, imgroute1);
-    // 给当前按钮做按下功能
+    // 给当前按钮做按下的图片设置
     GuaButtonSetImage(view, i1, ipressed);
     
     return 0;
@@ -79,33 +79,16 @@ _onEvent(GuaView *view, GuaEvent event) {
     // 有多种处理方式，具体哪种好，需要你自己的尝试
     GuaButton *button = (GuaButton *)view;
     GuaButtonData *data = (GuaButtonData *)button->data;
-//    GuaView *p = button->parent;
-    // printf("type state %d %d", event.type, event.state);
     if (event.state == 1) {
-//        if (data->pressed == true) {
-//            data->pressed = false;
-//        } else if (data->pressed == false) {
-//            data->pressed = true;
-//        }
         if (button->parent->buttonpressed == button->name) {
             button->parent->buttonpressed = NULL;
         } else {
             button->parent->buttonpressed = button->name;
         }
-        
         if (data->action != NULL) {
             data->action(button);
         }
-//        printf("true\n");
     }
-//    if (event.state == 2) {
-//        data->pressed = false;
-//        // printf("pressed-false\n");
-//        // 执行按钮事件
-//        if (data->action != NULL) {
-//            data->action(button);
-//        }
-//    }
     return 0;
 }
 

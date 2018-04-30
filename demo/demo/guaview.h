@@ -75,7 +75,7 @@ struct _GuaView {
 
 
 int
-on(GuaView *v, GuaEvent event);
+drawpix(GuaView *v, GuaEvent event);
 
 GuaView *
 GuaViewCreate(GuaRect frame);

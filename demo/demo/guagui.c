@@ -45,12 +45,7 @@ GuaGuiInit(void) {
                                   -1,
                                   SDL_RENDERER_ACCELERATED
                                   );
-    // imagepen = SDL_LoadBMP("/Users/yuki/ff/git-axe/demo/demo/images/pen.bmp");
-    // texturepen = SDL_CreateTextureFromSurface(renderer, imagepen);
-    // init lua
-    //    L = luaL_newstate();
-    //    luaL_openlibs(L);
-    // init font
+
     const char *fontPath = "OpenSans-Regular.ttf";
     // 打开字体 参数是 fontpath and fontsize
     font = TTF_OpenFont(fontPath, 34);

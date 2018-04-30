@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "guagui.h"
 #include "guaview.h"
@@ -97,7 +98,9 @@ main(int argc, const char *argv[]) {
     GuaView *v = GuaViewCreate(framecanvas);
     GuaViewAdd(rootView, v);
     v->draw = drawPixels;
-    v->onEvent = on;
+    
+    v->onEvent = drawpix;
+    
     v->backgroundColor = (GuaColor){
         0, 0, 0, 0,
     };
