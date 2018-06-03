@@ -9,6 +9,7 @@ bubble
 heap
 quick
 """
+heapsize = 0
 
 
 def insertion(a):
@@ -24,7 +25,7 @@ def insertion(a):
 def selection(a):
     for i in range(0, len(a) - 1):
         min = i
-        for j in range(i + 1, a.length):
+        for j in range(i + 1, len(a)):
             if a[j] < a[min]:
                 min = j
         temp = a[i]
@@ -41,9 +42,66 @@ def bubble(a):
                 a[j - 1] = temp
 
 
+def heap_left(i):
+    return 2 * i
+
+
+def heap_right(i):
+    return 2 * i + 1
+
+
+def max_heapify(a, i):
+    # 使列表 a 的 i 结点起的子树符合最大堆
+    l = heap_left(i)
+    r = heap_right(i)
+    if l < heapsize and a[l] > a[i]:
+        largest = l
+    else:
+        largest = i
+    if r < len(a):
+        if r < heapsize and a[r] > a[largest]:
+            largest = r
+    if largest != i:
+        temp = a[i]
+        a[i] = a[largest]
+        a[largest] = temp
+        max_heapify(a, largest)
+
+
+def build_max_heap(a):
+    # 将数组 a 转成最大堆
+    global heapsize
+    heapsize = len(a)
+    for i in range(int((len(a) - 1) / 2), -1, -1):
+        max_heapify(a, i)
+
+
 def heap(a):
-    pass
+    # 利用最大堆方法进行数组排序
+    global heapsize
+    build_max_heap(a)
+    # print('avdadv', a)
+    for i in range(int(len(a)) - 1, -1, -1):
+        temp = a[0]
+        a[0] = a[i]
+        a[i] = temp
+        heapsize = heapsize - 1
+        max_heapify(a, 0)
 
 
-def quick(a):
-    pass
+def partition(a, p, r):
+    x = a[r - 1]
+    i = p - 1
+    for j in range(p, r):
+        if a[j - 1] <= x:
+            i = i + 1
+            a[i - 1], a[j - 1] = a[j - 1], a[i - 1]
+    a[i], a[r - 1] = a[r - 1], a[i]
+    return i + 1
+
+
+def quick(a, p, r):
+    if p < r:
+        q = partition(a, p, r)
+        quick(a, p, q - 1)
+        quick(a, p + 1, r)

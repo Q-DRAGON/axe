@@ -34,14 +34,25 @@ def test_insertion():
 def test_selection():
     a = random_array()
     expected = sorted(a)
-    sort.insertion(a)
+    sort.selection(a)
     s = 'selection failed ({})'.format(a)
     assert str(expected) == str(a), s
 
 
-# def test():
-#     test_bubble()
-#     test_insertion()
+def test_heap():
+    a = random_array()
+    expected = sorted(a)
+    sort.heap(a)
+    s = 'heap failed ({})'.format(a)
+    assert str(expected) == str(a), s
+
+
+def test_quick():
+    a = random_array()
+    expected = sorted(a)
+    sort.quick(a, 1, len(a))
+    s = 'quick failed ({})'.format(a)
+    assert str(expected) == str(a), s
 
 
 if __name__ == '__main__':
