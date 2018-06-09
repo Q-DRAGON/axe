@@ -80,6 +80,7 @@ def middle(node):
         else:
             return kth_node(node, math.floor(l / 2) + 1)
 
+
 def append(node, x):
     # 7, 给单链表末尾插入一个元素
     a = last_node(node)
@@ -211,7 +212,7 @@ def merge_list(node1, node2):
         a.append(kth_node(node1, i + 1).value)
     a.sort()
     node = ListNode(a[0])
-    for i in range(len(a) - 1):
+    for i in range(1, len(a) - 1):
         append(node, a[i + 1])
     return node
 

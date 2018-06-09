@@ -128,5 +128,74 @@ def test_delete_last_n():
     assert str(0) == str(length(a4)), 'delete_last_n failed 3'
 
 
+def test_reverse():
+    a1 = init_list()
+    a11 = reverse(a1)
+    assert str(1) == str(kth_node(a11, 3).value), 'reverse failed 1'
+    append(a1, 4)
+    a22 = reverse(a1)
+    assert str(4) == str(kth_node(a22, 1).value), 'reverse failed 2'
+    append(a1, 4)
+    append(a1, 5)
+    a33 = reverse(a1)
+    assert str(4) == str(kth_node(a33, 2).value), 'reverse failed 3'
+
+
+def test_is_palindrome():
+    a1 = init_list()
+    assert str(False) == str(is_palindrome(a1)), 'is_palindrome failed 1'
+    append(a1, 2)
+    assert str(False) == str(is_palindrome(a1)), 'is_palindrome failed 2'
+    append(a1, 2)
+    append(a1, 1)
+    assert str(True) == str(is_palindrome(a1)), 'is_palindrome failed 3'
+
+
+def test_is_circle():
+    a1 = init_list()
+    assert str(False) == str(is_circle(a1)), 'is_circle failed 1'
+    append(a1, 2)
+    assert str(False) == str(is_circle(a1)), 'is_circle failed 2'
+    last_node(a1).next = a1
+    assert str(True) == str(is_circle(a1)), 'is_circle failed 3'
+
+
+def test_copy():
+    a1 = init_list()
+    assert str(3) == str(length(copy(a1))), 'copy failed 1'
+    assert str(3) == str(kth_node(a1, 3).value), 'copy failed 2'
+    append(a1, 2)
+    assert str(4) == str(length(copy(a1))), 'copy failed 3'
+
+
+def test_power_copy():
+    a1 = init_list()
+    last_node(a1).next = a1
+    assert str(1) == str((power_copy(a1).value)), 'power_copy failed 1'
+    assert str(2) == str((power_copy(a1).next.value)), 'power_copy failed 2'
+    assert str(1) == str((power_copy(a1).next.next.next.value)), 'power_copy failed 3'
+
+
+def test_merge_list():
+    a1 = init_list()
+    a2 = init_list()
+    a3 = merge_list(a1, a2)
+    assert str(6) == str(length(a3)), 'merge_list failed 1'
+    assert str(1) == str(kth_node(a3, 2).value), 'merge_list failed 2'
+    assert str(3) == str(kth_node(a3, 6).value), 'merge_list failed 3'
+
+
+def test_joseph_list():
+    a1 = init_list()
+    last_node(a1).next = a1
+    assert str(3) == str(joseph_list(a1, 2)), 'joseph_list failed 1'
+    a1 = init_list()
+    last_node(a1).next = a1
+    assert str(3) == str(joseph_list(a1, 1)), 'joseph_list failed 2'
+    a1 = init_list()
+    last_node(a1).next = a1
+    assert str(2) == str(joseph_list(a1, 3)), 'joseph_list failed 3'
+
+
 if __name__ == '__main__':
     test()
