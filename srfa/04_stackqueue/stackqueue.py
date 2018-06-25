@@ -19,13 +19,13 @@ class Stack(object):
         self.data.append(x)
 
     def pop(self):
-        n = len(self.data) - 1
-        a = self.data[n]
-        del self.data[n]
-        return a
+        return self.data.pop()
 
     def length(self):
         return len(self.data)
+
+    def last(self):
+        return self.data[-1]
 
 
 class Queue(object):
@@ -150,6 +150,23 @@ class Stack3(object):
 # deque.pop_front
 # deque.push_back
 # deque.pop_back
+class Deque(object):
+    def __init__(self):
+        self.data = []
+
+    def push_front(self, x):
+        self.data.insert(0, x)
+
+    def pop_front(self):
+        a = self.data[0]
+        del self.data[0]
+        return a
+
+    def push_back(self, x):
+        self.data.append(x)
+
+    def pop_back(self):
+        return self.data.pop()
 
 
 # 6, 实现 StackSet, 它内部由多个容量为 3 的 stack 组成, 并且在前一个栈填满时新建一个 stack
@@ -157,21 +174,110 @@ class Stack3(object):
 # s = StackSet(n)
 # s.push
 # s.pop
+class StackSet(object):
+    def __init__(self):
+        self.container = []
+        a = Stack()
+        self.container.append(a)
 
+    def push(self, x):
+        len_container = len(self.container)
+        last_stack = self.container[len_container - 1]
+        if last_stack.length() == 3:
+            b = Stack()
+            b.push(x)
+            self.container.append(b)
+        else:
+            last_stack.push(x)
 
-# 7, 为 StackSet 添加一个 pop_from(index) 方法
-# index 是指定的子栈下标
+    def pop(self):
+        len_container = len(self.container)
+        last_stack = self.container[len_container - 1]
+        result = last_stack.pop()
+        if last_stack.length() == 0:
+            if len_container != 1:
+                del self.container[len_container - 1]
+        return result
+
+    # 7, 为 StackSet 添加一个 pop_from(index) 方法
+    # index 是指定的子栈下标
+    def pop_from(self, index):
+        len_container = len(self.container)
+        if index > len_container - 1:
+            print('No such stack')
+        else:
+            target_stack = self.container[index]
+            if target_stack.length() == 0:
+                print('No such index')
+            else:
+                return target_stack.pop()
 
 
 # 8, 设计一个符合下面复杂度的栈
 # push    O(1)
 # pop     O(1)
 # min     O(1) 返回栈中的最小元素
+class Stack4(object):
+    def __init__(self):
+        self.data = []
+        self.min_index = -1
+
+    def push(self, x):
+        self.data.append(x)
+        if self.min_index == -1:
+            self.min_index = 0
+        min_now = self.data[self.min_index]
+        if x < min_now:
+            self.min_index = len(self.data) - 1
+
+    def pop(self):
+        return self.data.pop()
+
+    def length(self):
+        return len(self.data)
+
+    def min(self):
+        return self.data[self.min_index]
 
 
 # 9, 给定一个字符串其中包含无数个圆括号和其他字符，使用栈来确定圆括号是匹配的
 # 本题不理解题意的话要在 slack、群 中问清楚
+def bracket_suit(s):
+    a = Stack()
+    for k, v in enumerate(s):
+        if v == '(':
+            a.push(k)
+        elif v == ')':
+            if a.length != 0:
+                a.pop()
+            else:
+                return False
+    return a.length() == 0
 
 
 # 10, 给定一个字符串其中包含无数个圆括号、方括号和其他字符，使用栈来确定圆括号和方括号是匹配的
 # 本题不理解题意的话要在 slack、群 中问清楚
+def bracket_both_suit(s):
+    a = Stack()
+    b = Stack()
+    now = []
+    for k, v in enumerate(s):
+        if v in '([':
+            a.push(v)
+        elif v in ')':
+            if a.last() == '(':
+                if a.length != 0:
+                    a.pop()
+                else:
+                    return False
+            else:
+                return False
+        elif v in ']':
+            if a.last() == '[':
+                if a.length != 0:
+                    a.pop()
+                else:
+                    return False
+            else:
+                return False
+    return a.length() == 0 and b.length() == 0

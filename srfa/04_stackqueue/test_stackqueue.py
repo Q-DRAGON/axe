@@ -63,5 +63,71 @@ def test_stack3():
     assert str(x3) == str(1), 'stack3 failed, 3'
 
 
+def test_deque():
+    d = Deque()
+    d.push_front(1)
+    d.push_front(2)
+    assert str(d.data) == str([2, 1]), 'deque failed 1'
+    d.push_back(3)
+    assert str(d.data) == str([2, 1, 3]), 'deque failed 2'
+    d.pop_front()
+    assert str(d.data) == str([1, 3]), 'deque failed 3'
+    d.pop_back()
+    assert str(d.data) == str([1]), 'deque failed 4'
+
+
+def test_stackset():
+    s = StackSet()
+    s.push(1)
+    x1 = s.pop()
+
+    s.push(1)
+    s.push(2)
+    x2 = s.pop()
+
+    x3 = s.pop()
+
+    assert str(x1) == str(1), 'stackset failed, 1'
+    assert str(x2) == str(2), 'stackset failed, 2'
+    assert str(x3) == str(1), 'stackset failed, 3'
+
+
+def test_pop_from():
+    s = StackSet()
+    s.push(1)
+    s.push(2)
+    s.push(3)
+    s.push(4)
+    assert str(s.pop_from(0)) == str(3), 'popfrom failed, 1'
+    assert str(s.pop_from(0)) == str(2), 'popfrom failed, 2'
+    assert str(s.pop_from(1)) == str(4), 'popfrom failed, 3'
+
+
+def test_stack4():
+    s = Stack4()
+    s.push(1)
+    assert str(s.min()) == str(1), 'stack4 failed, 1'
+    s.push(2)
+    s.push(3)
+    assert str(s.min()) == str(1), str(s.min())+'stack4 failed, 2'
+    s.push(0)
+    assert str(s.min()) == str(0), 'stack4 failed, 4'
+
+
+def test_bracket_suit():
+    a = '(a + b * (c % (d / w)))'
+    assert str(bracket_suit(a)) == str(True), 'bracket_suit failed 1'
+    b = '(a + b * (c % (d / w))'
+    assert str(bracket_suit(b)) == str(False), 'bracket_suit failed 2'
+
+
+def test_bracket_both_suit():
+    a = '(a + b * (c % [d / w]))'
+    assert str(bracket_both_suit(a)) == str(True), 'bracket_both_suit failed 1'
+    b = '(a + b * [c % (d / w)))'
+    assert str(bracket_both_suit(b)) == str(False), 'bracket_both_suit failed 2'
+    c = '([)]'
+    assert str(bracket_both_suit(c)) == str(False), 'bracket_both_suit failed 3'
+
 if __name__ == '__main__':
     test()
