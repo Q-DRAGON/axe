@@ -1,4 +1,3 @@
 *.xcodeproj
 .idea/
 *.xcuserstate
-*/__pycache__/

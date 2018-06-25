@@ -1,5 +1,4 @@
 import random
-import sort
 from stackqueue import *
 
 def test_stack_queue():
