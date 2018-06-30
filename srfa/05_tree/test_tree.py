@@ -1,20 +1,100 @@
-import random
-from stackqueue import *
+from tree import *
 
-def test_stack_queue():
-    s = Stack()
-    s.push(1)
-    s.push(2)
-    assert str(s.data) == str([1, 2]), 'stack push wrong'
-    s.pop()
-    assert str(s.data) == str([1]), 'stack pop wrong'
 
-    q = Queue(5)
-    q.enqueue(1)
-    q.enqueue(2)
-    assert str(q.data) == str([1, 2]), 'queue enqueue wrong'
-    q.dequeue()
-    assert str(q.data) == str([2]), 'queue dequeue wrong'
+def make_a_tree():
+    n1 = TreeNode(6)
+    n2 = TreeNode(5)
+    n3 = TreeNode(7)
+    n4 = TreeNode(2)
+    n5 = TreeNode(5)
+    n6 = TreeNode(8)
+
+    n1.left = n2
+    n1.right = n3
+    n2.left = n4
+    n2.right = n5
+    n3.right = n6
+
+    return n1
+
+
+def make_a_tree2():
+    n1 = TreeNode(6)
+    n2 = TreeNode(5)
+    n3 = TreeNode(7)
+    n4 = TreeNode(2)
+    n5 = TreeNode(5)
+    n6 = TreeNode(8)
+
+    n1.right = n2
+    n1.left = n3
+    n2.right = n4
+    n2.left = n5
+    n3.left = n6
+
+    return n1
+
+
+def test_inorder_tree_walk():
+    tree = make_a_tree()
+    tree.inorder_tree_walk(tree)
+    assert str(numbers) == str([2, 5, 5, 6, 7, 8]), 'inorder_tree_walk wrong'
+
+
+def test_backorder_tree_walk():
+    numbers.clear()
+    tree = make_a_tree()
+    tree.backorder_tree_walk(tree)
+    assert str(numbers) == str([2, 5, 5, 8, 7, 6]), 'backorder_tree_walk wrong'
+
+
+def test_preorder_tree_walk():
+    numbers.clear()
+    tree = make_a_tree()
+    tree.preorder_tree_walk(tree)
+    assert str(numbers) == str([6, 5, 2, 5, 7, 8]), 'preorder_tree_walk wrong'
+
+
+def test_broad_first():
+    tree = make_a_tree()
+    assert str(tree.broad_first(tree, 6)) == str(True), 'test_broad_first wrong 1'
+    assert str(tree.broad_first(tree, 5)) == str(True), 'test_broad_first wrong 2'
+    assert str(tree.broad_first(tree, 11)) == str(False), 'test_broad_first wrong 3'
+
+
+def test_depth_first():
+    tree = make_a_tree()
+    assert str(tree.depth_first(tree, 6)) == str(True), 'test_depth_first wrong 1'
+    assert str(tree.depth_first(tree, 5)) == str(True), 'test_depth_first wrong 2'
+    assert str(tree.depth_first(tree, 11)) == str(False), 'test_depth_first wrong 3'
+
+
+def test_inorder_tree_walk2():
+    numbers.clear()
+    tree = make_a_tree()
+    tree.inorder_tree_walk2()
+    assert str(numbers) == str([2, 5, 5, 6, 7, 8]), 'inorder_tree_walk2 wrong'
+
+
+def test_invert():
+    numbers.clear()
+    tree = make_a_tree()
+    tree2 = tree.invert(tree)
+    tree2.inorder_tree_walk(tree2)
+    assert str(numbers) == str([8, 7, 6, 5, 5, 2]), 'invert wrong'
+
+
+def test_pair_or_not():
+    numbers.clear()
+    tree1 = make_a_tree()
+    tree2 = make_a_tree2()
+
+    assert str(tree2.pair_or_not(tree1, tree2)) == str(True), 'pair_or_not wrong'
+
+
+def test_max_depth():
+    tree = make_a_tree()
+    assert str(tree.max_depth(tree)) == str(3), 'max_depth wrong'
 
 
 if __name__ == '__main__':
