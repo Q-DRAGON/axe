@@ -97,5 +97,14 @@ def test_max_depth():
     assert str(tree.max_depth(tree)) == str(3), 'max_depth wrong'
 
 
+def test_inorder_and_backorder():
+    numbers.clear()
+    numbers2.clear()
+    tree = make_a_tree()
+    tree.inorder_and_backorder(tree)
+    assert str(numbers) == str([2, 5, 5, 8, 7, 6]), 'inorder_and_backorder-back wrong'
+    assert str(numbers2) == str([6, 5, 2, 5, 7, 8]), 'inorder_and_backorder-pre wrong'
+
+
 if __name__ == '__main__':
     test()

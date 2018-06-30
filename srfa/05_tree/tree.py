@@ -14,6 +14,7 @@ from queue import Queue
 
 
 numbers = []
+numbers2 = []
 
 
 class Stack(object):
@@ -146,6 +147,15 @@ class TreeNode:
 # 10, 对于一棵有 n 个节点的二叉树, 请设计在 θ(n) 时间内完成先序遍历算法和后序遍历算法
     # θ(n) 的含义是，去除了常数的 O(n), 也就是说 θ(n) 就是确定的 n
     # 在这里意思是一次遍历得到先序和后序的结果
-    
+    def inorder_and_backorder(self, x):
+        if x is not None:
+            # numbers2 前序结果
+            numbers2.append(x.value)
+            self.inorder_and_backorder(x.left)
+            self.inorder_and_backorder(x.right)
+            # numbers 后序结果
+            numbers.append(x.value)
 
 # 11, 选做，能否用栈实现广度优先？优势是什么？
+    # 可以用两个子栈完成，类似 课 4 的第 3 题。
+    # 优势是可以用空间换时间，将出栈或入栈其中之一的时间复杂度变为 O(n)。
