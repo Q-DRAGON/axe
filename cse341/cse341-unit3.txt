@@ -1,0 +1,245 @@
+Unit 3 一级函数和闭包
+
+42. 一级函数的介绍
+一级函数：可以像其它值一样，被计算、传递、存储的函数。
+函数闭包：使用函数外定义的变量的函数，这个功能让函数的功能更强大。
+高阶函数：使用或返回其它函数的函数。
+函数式编程：1）几乎不能使用可变的数据。2）把函数作为值使用。
+函数式编程的其它特点：
+    1）鼓励递归和递归的数据结构。
+    2）句法和模式与传统的数学学科中对函数/方程的定义很接近。
+    3）没有任何的面向对象编程思想。
+    4）使用特定的懒惰编程语言。
+
+43. 函数作为参数
+通过抽象代码块，达到复用的目的。
+
+44. 多态的数据类型和函数作为参数
+参数多态性 = 泛型类型：参数可以是多种类型，但可能几个要求是同一个类型。
+参数多态，外加一级函数，使我们的代码复用率更高。
+
+45. 匿名函数
+局部环境中使用的函数：
+fun triple_n_times (n,x) =
+  let
+    fun triple x = 3*x
+  in
+    n_times(triple,n,x)
+  end
+范围更小的写法：
+fun triple_n_times (n,x) = n_times((let fun triple y = 3*y in triple end), n, x)
+匿名函数的写法：
+fun triple_n_times (n,x) = n_times((fn y => 3*y), n, x)
+匿名函数无法递归。
+对于不递归的函数，可以用变量绑定匿名函数，代替函数绑定。如以下两个函数绑定完全等价：
+fun increment x = x + 1
+val increment = fn x => x+1
+函数绑定可以用来递归。
+
+46. 不必要的函数包装
+当写作 fn x => f x 的时候，其实可以直接写 f 。
+
+47. 高阶函数 Map 和 Filter
+fun map (f,xs) =
+    case xs of
+        [] => []
+      | x::xs’ => (f x)::(map(f,xs’))
+对 list xs 中的每一个数据执行 f 函数。
+
+fun filter (f,xs) =
+    case xs of
+        [] => []
+      | x::xs’ => if f x
+                     then x::(filter (f,xs’))
+                     else filter (f,xs’)
+举例：
+fun get_all_even_snd xs = filter((fn (_,v) => v mod 2 = 0), xs)
+xs 是 pairs 组成的 list, 且第二个元素是 int。返回第二个数字是偶数的 list。
+
+48. 概括
+1）函数的返回值可以是函数。
+fun double_or_triple f =
+    if f 7
+    then fn x => 2*x
+    else fn x => 3*x
+2）高阶函数的用法，如复用true_of_all_constants。
+datatype exp = Constant of int | Negate of exp | Add of exp * exp | Multiply of exp * exp
+fun is_even v =
+    (v mod 2 = 0)
+fun true_of_all_constants(f,e) =
+    case e of
+        Constant i      => f i
+      | Negate e1       => true_of_all_constants(f,e1)
+      | Add(e1,e2)      => true_of_all_constants(f,e1) andalso true_of_all_constants(f,e2)
+      | Multiply(e1,e2) => true_of_all_constants(f,e1) andalso true_of_all_constants(f,e2)
+fun all_even e = true_of_all_constants(is_even,e)
+
+49. Lexical scope
+函数在其被定义的环境中被计算，而不是被调用的环境。这个语义就被称为 lexical scope。
+val x = 1
+fun f y = x + y
+val x = 2
+val y = 3
+val z = f (x+y)
+以上例子的执行：
+1）找到函数 f
+2）计算参数 x+y，在当前环境中找到，是 5。
+3）调用 f 函数，参数是 5 ，但调用函数时在旧的定义函数的环境中计算函数，这时 x 是 1，结果是 6 。
+所以参数是在当前环境计算的，而函数体是在被定义的环境中计算的。
+可替换的，还有一个低级的语义，在这个低级语义中你使用当前环境进行计算，这个语义就是动态环境。在此例中，动态环境的计算结果是 7 。
+
+50. Lexical scope 和高阶函数
+环境和闭包：
+函数值包含两部分，函数的代码和创建函数时的环境。这两部分被称为函数闭包或闭包。
+需要闭包的原因是，代码可以用到自由变量（并不是在代码内部绑定的变量，所以需要被外界环境绑定），闭包携带一个能提供这些变量绑定的环境。
+所以只要给定参数，闭包就可以产生一个函数结果。
+与高阶函数结合的两个例子：
+略。
+
+51. Lexical scope 的意义
+动态环境（只有一个当前环境，在这个环境中计算函数体的值）的缺点：
+1）改变变量名时，可能会有副作用。
+2）动态环境不利于实施分而治之的思想。
+但是有一种更像是使用动态环境的变量，是异常处理。当一个异常被抛出，当查找哪个表达式应该被处理时，使用到的就是动态调用栈。
+
+52. 把闭包传给像 Filter 这样的迭代器
+之前的例子并没有传递函数的环节，只用到了他们的参数或者本地变量。但是传递闭包的环境可以使高阶函数的应用范围更广。
+fun filter (f,xs) =
+    case xs of
+        [] => []
+      | x::xs’ => if f x then x::(filter(f,xs’)) else filter(f,xs’)
+fun allGreaterThanSeven xs = filter (fn x => x > 7, xs)
+fun allGreaterThan (xs,n) = filter (fn x => x > n, xs)
+在 allGreaterThan 函数被 filter 调用时，需要找到 n 所处的环境，就是 fn x => x > n 被定义的地方。
+
+53. Fold 和更多闭包的例子
+fun fold (f,acc,xs) =
+    case xs of
+      [] => acc
+    | x::xs’ => fold (f, f(acc,x), xs’)
+Fold 函数接收用户传进来的闭包，这些闭包通过变量绑定的形式，可以有自己“私有的空间”来保留他们想要分析的数据。
+两个例子：
+fun numberInRange (xs,lo,hi) =
+    fold ((fn (x,y) =>x + (if y >= lo andalso y <= hi then 1 else 0)),0, xs)
+
+fun areAllShorter (xs,s) =
+    let
+        val i = String.size s
+    in
+        fold((fn (x,y) => x andalso String.size y < i), true, xs)
+    end
+
+54. 闭包常用方法: 函数组合
+函数组合：
+当使用很多个函数的时候，可以创建新的函数把其它函数组合在一起。
+fun compose (f,g) = fn x => f (g x)
+ML 中可以用中缀符 o 连接函数：
+fun sqrt_of_abs i = Math.sqrt(Real.fromInt (abs i))
+可以写成：
+fun sqrt_of_abs i = (Math.sqrt o Real.fromInt o abs) i
+或：
+val sqrt_of_abs = Math.sqrt o Real.fromInt o abs
+
+管线操作符：
+把从右向左变成了从左向右。
+fun x |> f = f x
+fun sqrt_of_abs i = i |> abs |> Real.fromInt |> Math.sqrt
+
+55. 闭包常用方法: 柯里化和局部应用
+柯里化：
+    之前的高阶方程都是只有一个参数，为了解决多参数的传递，原来的方法可以是传递一个 tuple，另外也可以使用柯里化的写法，将第一个概念上的参数传递进去，返回另一个函数接收第二个概念上的参数，以此类推。
+    val sorted3 = fn x => fn y => fn z => z >= y andalso y >= x
+    调用写：
+    ((sorted3 4) 5) 6
+    或：
+    sorted3 4 5 6
+    原来的写法：
+    fun sorted3_tupled (x,y,z) = z >= y andalso y >= x
+    val someClient = sorted3_tupled(4,5,6)
+
+56. 局部应用
+局部应用：
+    柯里化的局部应用（传入的参数少于应该传入的参数）返回一个函数。
+局部应用和高阶函数：
+    柯里化很适合利用迭代器创造近似的函数。
+    柯里化的 fold:
+    fold f acc xs =
+        case xs of
+          [] => acc
+        | x::xs’ => fold f (f(acc,x)) xs’
+柯里化的通常应用：
+    除了高阶函数，柯里化也可以很通用，如使用在多参数函数上。
+组合函数进行柯里化和反柯里化：
+    fun other_curry1 f = fn x => fn y => f y x
+    fun other_curry2 f x y = f y x
+    fun curry f x y = f (x,y)
+    fun uncurry f (x,y) = f x y
+
+57. 柯里化总结
+值限制
+以下赋值可以成功：
+fun mapSome xs = List.map SOME xs
+val mapSome = fn xs => List.map SOME xs
+val pairIt : int list -> (int * int) list = List.map (fn x => (x,x))
+val incrementIt = List.map (fn x => x+1)
+以下不成功：
+val mapSome = List.map SOME (*turn [v1,v2,...,vn] into [SOME v1, SOME v2, ..., SOME vn]*)
+val pairIt = List.map (fn x => (x,x)) (*turn [v1,v2,...,vn] into [(v1,v1),(v2,v2),...,(vn,vn)]*)
+不成功的原因叫做 value restriction。是类型检查器不通过时报的错。
+当遇到报错时，把值绑定改成函数绑定即可。
+
+58. 可变的引用
+ML 也是可以允许变化的。什么时候可以变化呢？
+当改变一个事物的状态，以便这个事物的所有用户都能看到变化的发生，这是允许可变的关键途径。
+同时，我们希望让可变的特征能被隔离开，以便知道什么时候不能变化。
+reference 在 ML 里是可以变化的。
+创建引用：
+ref e
+得到引用当前的内容：
+!r
+改变引用的内容：
+r := e
+引用的内容的类型是 t 的写法：
+t ref
+举例：
+val x = ref 0
+val x2 = x (* x and x2 both refer to the same reference *)
+val x3 = ref 0
+(* val y = x + 1*) (* wrong: x is not an int *)
+val y = (!x) + 1 (* y is 1 *)
+val _ = x := (!x) + 7 (* the contents of the reference x refers to is now 7 *)
+val z1 = !x (* z1 is 7 *)
+val z2 = !x2 (* z2 is also 7 -- with mutation, aliasing matters*)
+val z3 = !x3 (* z3 is 0 *)
+
+59. 另一个闭包的应用: 回调
+回调函数：一个函数当事件发生时被调用。
+需要用到引用的格式，因为是可变的变量。
+
+60. 标准库文档
+如果觉得查阅标准库效率低，可以使用 REPL 打印一个结构提供的所有绑定：
+structure X = List; (* List is the structure we want to know about *)
+structure X : LIST  (* This is what the REPL gives back *)
+signature X = LIST; (* Write LIST because that is what follows the : on the previous line *)
+
+61. 选学: 带有闭包的抽象数据类型
+抽象数据类型（ADT）的关键，是让用户通过函数集合来使用它，而不是直接访问它自己的私有实现方式。
+这样我们可以改变数据类型的完成方式，而不改变它对用户的行为。
+使用闭包来“记忆”一个集合都具有哪些元素。
+（举例中，一个集合，三个字段，每个字段都是一个闭包。这些闭包可以访问参数 xs 、辅助函数。）
+
+62. 选学: 没有闭包的语言实现闭包惯用方法
+当语言不提供闭包时，我们手动创建它
+OOP 模式的 Java，使用单一方法的接口
+过程语言如 C，将环境作为参数通过函数指针传递
+
+63. 选学: 没有闭包的 Java 举例
+使用泛型，我们可以用一个方法定义一个接口，然后可以像使用函数类型一样使用这个方法。
+
+64. 选学: 没有闭包的 C 举例
+C确实有函数，但它们不是闭包。如果你把一个指针传递给一个函数，它只是一个代码指针。
+如果一个函数参数只能使用它的参数，那么高阶函数就不那么有用了。
+模拟方法：
+    明确地将环境作为另一个参数。
+    让函数参数也带一个环境。
+    调用函数参数时，将环境传递给它。

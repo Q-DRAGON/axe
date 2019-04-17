@@ -1,0 +1,267 @@
+Unit 5 Racket, 延迟计算, 记忆化, 宏
+
+83. Racket 介绍
+Racket 和 ML 有很多相似之处: 它们都是函数式语言，具有闭包、匿名函数、对 list 方便的支持、没有 return 语句等等。
+二者的主要区别：
+    Racket 不使用静态类型系统，所以它能接受更多程序，程序员也不需要总是定义新的类型，但是更多的错误直到程序运行的时候才会出现。
+    Racket 具有非常简单和统一的语法。
+Racket 和 Scheme
+    Racket 起源于 Scheme。（Scheme 起源于 LISP。）
+    二者有少量关键的不同，一些小的不同，和更多的是 Racket 增加的内容。
+
+84. Racket 定义、函数、选择控制
+Racket 文件第一行必有：
+    #lang racket
+定义：
+    (define a 3)
+    (define b (+ a 2))
+在 ML 中，绑定可以用到文件后面的绑定，而在 Racket，所有东西都是前置的。
+匿名函数：
+    (lambda (x) e)
+把匿名函数绑定给 cube1 ：
+    (define cube1
+      (lambda (x)
+        (* x (* x x))))
+Racket 可以有多个参数，直到运行时才会报出参数数量错误，三个参数的函数看起来是 (lambda (x y z) e) 。很多函数可以使用任意数量的参数，所以以上函数可以写成：
+    (define cube2
+      (lambda (x)
+        (* x x x)))
+        可以查看文档，如何创建有不同数量的参数的函数。
+不像 ML,你可以用匿名函数使用递归，因为函数的定义是在函数体的范围内。
+    (define pow
+      (lambda (x y)
+        (if (= y 0)
+            1
+            (* x (pow x (- y 1))))))
+条件判断语法：
+    (if e1 e2 e3)
+    假 #f 执行 e3
+    真 #t 执行 e2
+    以下是语法糖写法，省略匿名函数 lambda:
+    (define (cube3 x)
+      (* x x x))
+    (define (pow x y)
+        (if (= y 0)
+            1
+            (* x (pow x (- y 1)))))
+    写起来很像 ML 中的函数绑定，但是在 ML 中，fun 不仅仅是语法糖，还为了方便递归。
+Racket 也可以使用柯里化：
+    (define pow
+      (lambda (x)
+        (lambda (y)
+          (if (= y 0)
+              1
+              (* x ((pow x) (- y 1)))))))
+    (define three-to-the (pow 3))
+    (define eightyone (three-to-the 4))
+    (define sixteen ((pow 2) 4))
+    因为 Racket 函数的多参数是真的多参数，在调用柯里化函数的时候没有语法糖。所以，我们必须写成 ((pow 2) 4) 因为 (pow 2 4) 相当于用两个参数调用了接收一个参数的 pow。我们可以写成：
+    (define ((pow x) y)
+        (if (= y 0)
+            1
+            (* x ((pow x) (- y 1)))))
+    这是一个新特性。
+
+85. Racket Lists
+List:
+    Primitive   Description                        Example
+    null        The empty list                     null
+    cons        Construct a list                   (cons 2 (cons 3 null))
+    car         Get first element of a list        (car some-list)
+    cdr         Get tail of a list                 (cdr some-list)
+    null?       Return #t for the empty-list       (null? some-value)
+                    and #f otherwise
+    内置 list 函数创建新的 list：(list 2 3 4)，list 中的元素可以不是同一种类型。
+
+86. 语法和括号
+方括号也可以代替圆括号，但必须成对替换。
+
+87. 括号很重要！
+Racket 的实际编程需要正确使用圆括号，Racket 与 ML、Java、C 等有一个重要的区别：括号改变了程序的含义。您不能添加或删除它们，它们从来都不是可有可无或毫无意义的。
+比如（e) 就是计算 e 然后调用一个没有参数的函数的结果。而 (42) 就会报错。
+
+88. 动态类型
+假设我们想要一个数字列表，但是其中的一些元素实际上可以是其他的列表，这些列表本身包含数字或其他列表等等，有任意数量的层次。
+Racket 允许这样做，但在 ML 中，这样的表达式不会通过类型检查;我们需要创建自己的数据类型绑定，并在正确的位置使用正确的构造函数。
+
+89. Cond
+cond 对于嵌套条件式比实际使用多个 if 表达式更好:
+(define (sum xs)
+(cond [(null? xs) 0]
+        [(number? (car xs)) (+ (car xs) (sum (cdr xs)))]
+        [#t (+ (sum (car xs)) (sum (cdr xs)))]))
+cond 后可以有多个 [e1 e2] ，e1 的结果如果是 #f 就跳过到下一个分支，否则计算 e2 并且这就是答案。最后一个分支必须是 #t。
+对于 if 语句，判断语句不一定是布尔值，而不是 #f 的都被解释为 true。
+利用这个特性有时是一种糟糕的风格，但它可能是有用的。
+
+90. 本地绑定：let, let*, letrec, local 定义
+(let ([x1 e1]
+      [x2 e2]
+      ...
+      [xn en])
+  e)
+计算 e1 e2 ... en 时，用到的环境是 let 表达式之前的环境。比如 e3 不能使用 x1 和 x2，除非外界有同名变量。
+如果写成 let* ,那么语义在计算每一个绑定时，都处于前面的所有环境中。
+但是前两者都不能实现递归，因为不能使用后面的绑定。所以有了 letrec。但是在执行表达式时，依旧是按顺序执行的。
+通常使用 letrec 来定义一个或多个(相互的)递归函数。
+举例：
+(define (triple x)
+  (letrec ([y (+ x 2)]
+           [f (lambda (z) (+ z y w x))]
+           [w (+ x 7)])
+    (f -9)))
+举例：
+(define (mod2 x)
+  (letrec
+      ([even? (lambda (x) (if (zero? x) #t (odd? (- x 1))))]
+       [odd?  (lambda (x) (if (zero? x) #f (even? (- x 1))))])
+    (if (even? x) 0 1)))
+另一种方法是，您可以通过使用 local define 获得与 letrec 相同的行为。
+(define (mod2_b x)
+  (define even? (lambda(x) (if (zero? x) #t (odd? (- x 1)))))
+  (define odd?  (lambda(x) (if (zero? x) #f (even? (- x 1)))))
+  (if (even? x) 0 1))
+对于 local define 可以出现在哪里有限制；在函数体的开头是允许使用它们的一个常见位置。
+
+91. 顶层的定义
+一个 Racket 文件是一系列定义的模块。
+ML 的文件类似隐藏的 let* ，而 Racket 的类似 letrec。这很方便，因为它允许您在模块中按照自己喜欢的方式对函数进行排序。例如，您不需要将相互递归的函数放在一起，或者使用特殊的语法。
+但是又有几个新的注意点：
+    不能让两个绑定使用同一个变量。这是毫无意义的：使用变量会使用哪一个?
+    如果早期的绑定用到了一个晚一些的绑定，那么需要在函数体内这样做，以便晚一些的绑定在被使用之前就被初始化了。
+    在一个模块/文件中，没有顶级的覆盖（但你仍然可以在定义内部或 let 表达式内部进行覆盖），但是一个模块可以覆盖另一个文件中的绑定。然而， REPL 中的行为是不一样的，所以不要在 REPL 中用你自己的递归函数定义覆盖一个函数。
+
+92. 绑定一般都是可变的，因为 set!
+set! 在改变一个变量的绑定后，所有环境里有这个被改变的变量的代码都会受到副作用。
+(set! x 13)
+将 x 的值变为 13。
+举例：
+(define b 3)
+(define f (lambda (x) (* 1 (+ x b))))
+(define c (+ b 4))
+(set! b 5)
+(define z (f 4))
+(define w c)
+z 是 9，因为绑定到 f 的函数体在计算时会找 b 然后在当前的环境找到了 5。
+然而 w 是 7，因为当我们计算 (define c (+ b 4)) 时，b 是 3，所以这个表达式的值是把 c 绑定成 7，而不考虑 7 是如何得到的。
+顶层绑定的改变令人焦虑，因为我们不知道都有哪些代码用到它。
+在上例的 f 中，如果要防御这种变化，就在 b 可能变化后避免使用 b。
+解决方法是，如果某些东西可能发生变化，并且你需要旧的值，那么在发生变化之前进行复制：
+(define f
+   (let ([b b])
+    (lambda (x) (* 1 (+ x b)))))
+一个本地 b 初始化的时候被全局 b 赋值了。
+在 Racket 中，其实一个顶层绑定是不能改变的，除非定义它的模块包含了一个 set! 去改变它。
+所以如果文件中没有 set! 来改变绑定，我们可以放心其它文件是不能用 set! 对它进行改变的（否则会报错）。
+而且所有预先定义的函数比如 + * 所在的模块都是不能对它们使用 set! 的，所以它们不会被改变。
+
+93. 关于 Cons 的真相
+(cons 14 (cons #t null)) 相当于创建了一个 list ’(14 #t)。撇号表示这个括号不是调用而是 list。
+其实 cons 生成的都是一个 pair，第一个部分是 car 的部分，第二部分是 cdr 的部分。这种 pair 叫做 cons cell。
+我们写了 (cons (+ 7 7) #t) 生成的是 pair ’(14 . #t)，句号说明它不是 list。因为 list 要么是 null 要么是一个 cdr 是 list 的 pair。
+如果 cons cell 不是 list 会被称为不合适的 list，尤其是当它有嵌套的 cons cell 在第二个位置。
+比如 (cons 1 (cons 2 (cons 3 4))) 的结果是 ’(1 2 3 . 4)。
+一般在用 pair? 判断 cons 生成的变量得到的结果都是 true，比如任何合适的列表不合适的列表，除了空列表。
+为什么会这样？因为我们处理列表时，只需要他的 pairs 和识别列表的结尾。在 Racket 里，都用 null 常数作为 list 的结尾。
+
+94. mcons 作为可改变的 Pairs
+cons cells 都不能改变。这让 list? 的时间复杂度是常数级别的，因为每个 cons cell 在被创建的时候都可以存好它是不是合适的列表。
+set! 也不能改变 cons cell：
+(define x (cons 14 null))
+(define y x)
+(set! x (cons 42 null))
+(define fourteen (car y))
+比如这个例子中被改变的是 x 的 car，但是原来的 cons cell 并没有被改变，所以 y 的 car 还是 14，说明旧的 cons cell 并没有被改变。
+我们可以有可改变的 pair：
+mcons 创建一个可改变的 pair
+mcar
+mcdr
+mpair? 判断是否是一个可改变的 pair
+set-mcar! 传递一个可改变的 pair 和一个表达式，把表达式的值赋值给 pair 的第一部分
+set-mcdr!
+
+95-96. 延迟求值和形式转换（thunk）/避免不必要的计算
+延迟求值：
+    (e1 e2 ... en) 参数 e2 ... en 在执行函数体之前被计算，函数在被调用前会计算所有参数的值。如果此时有参数有问题，则函数调用会有问题。
+    (lambda (...) ...) 函数在调用函数体时才被求值。
+    (if e1 e2 e3) 我们不会全都计算 e2 和 e3，所以如果二者中有一个有问题，函数也可能成功运行。
+    (my-if e1 (e2) (e3)) 如果写成这种形式，e2 e3 是零参数的函数，只有在调用时才执行，在调用 if 语句时不会被执行。
+    这就是延迟求值的方法，即现在不要计算表达式，把它写成一个零参数的函数，函数只有在被调用时才计算它的值。
+thunk:
+    我们把这种零参数的函数叫做形式转换。
+    即把 e 改写成 (lambda () e)
+
+97. 延迟和强迫的惰性计算
+假设我们有一个大的计算，我们知道如何执行，但不知道是否需要执行它。
+程序的其他部分知道计算结果，可能有0、1或更多不同的位置。如果我们用了 thunk，那么我们可能会重复计算很多次。
+但是如果我们不用 thunk ，那么即使我们不需要，我们也会执行大量的计算。
+为了获得“两全其美”的好处，我们可以使用一些其它技巧：延迟评估、按需调用、承诺。
+我们的想法是用变异来记住我们第一次使用 thunk 时的结果，这样我们就不需要再使用 thunk 了。
+举例：
+(define (my-delay f)
+  (mcons #f f))
+(define (my-force th)
+  (if (mcar th)
+      (mcdr th)
+      (begin (set-mcar! th #t)
+             (set-mcdr! th ((mcdr th)))
+             (mcdr th))))
+第一个函数，f 是 thunk。第一个布尔值表示这个 thunk 是否被计算过。
+第二个函数，如果 thunk 没被计算过则计算并存它的值，如果被计算过，则直接使用值。
+举例：
+(define (my-mult x y)
+ (cond [(= x 0) 0]
+       [(= x 1) y]
+       [#t (+ y (my-mult (- x 1) y))]))
+在 e2 中，如果 y 计算起来需要很长时间，我们也可以 thunk 它：
+(define (my-mult x y-thunk)
+ (cond [(= x 0) 0]
+       [(= x 1) (y-thunk)]
+       [#t (+ (y-thunk) (my-mult (- x 1) y-thunk))]))
+这是我们就可以调用 (my-mult e1 (lambda () e2)) 了。
+但是此时如果 e1 是个大数，效率很低，改进：
+(my-mult e1 (let ([x (my-delay (lambda () e2))]) (lambda () (my-force x))))
+在 Haskell 中，如果一个参数从未被使用过，它将永远不会被求值，否则它只被求值一次，这被称为按需调用。
+而我们将使用的所有语言都是按值调用(参数在调用之前会被充分计算)。
+
+98-99. 使用 Streams / 定义 Streams
+用一个 pair 表示，第一个是 stream 的第一个值，第二个是用来表示流从第二个值到最后的一个 thunk。
+用到递归。
+例子略。
+
+100. 记忆化
+如果一个函数没有副作用，那么如果我们用相同的参数 (s) 多次调用它，我们实际上不需要多次调用。
+相反，我们可以查找第一次使用参数 (s) 调用函数时的答案。
+为了实现记忆化，我们确实使用了变化：
+每当函数被调用时，我们都会使用以前没有见过的参数，我们计算答案，然后将结果添加到表中(通过变化)。
+
+101. 宏：关键点
+宏允许程序员定义自己的语法糖，从而增加了语言的语法。
+宏定义：为语言引入了一些新的语法。
+宏系统：是一种用于定义宏的语言。
+宏使用：使用之前定义的宏。
+宏扩展：用宏的定义的语法换掉宏的使用。
+关键点：宏扩展发生在我们所了解的其他事情之前。
+
+102. 标记、括号和范围
+标记：写宏的时候需要了解这个语义的 token 是如何区分的。
+Racket 中，x 是宏的名称，扩展的结果“保持在相同的括号中”。
+Racket 中，宏扩展不可以在创建变量绑定时发生。局部变量可以覆盖宏。
+
+103. 定义宏
+(define-syntax my-if
+  (syntax-rules (then else)
+    [(my-if e1 then e2 else e3)
+     (if e1 e2 e3)]))
+define-syntax：定义宏的特殊形式。
+my-if：宏的名字，他被添加到了当前环境，所以后面用到它时可以进行宏扩展。
+syntax-rules：关键字。
+
+104. 变量、宏和 hygiene
+在宏定义中使用局部变量来控制表达式是否 / 何时被求值是你应该做的事情。
+基本上，每次使用宏时，它的所有局部变量都会被重写为新的变量名，而不会与程序中的任何其他变量冲突。
+这是 Racket 宏健康的原因之一。
+另一原因与宏观定义中的自由变量有关，确保它们不会错误地出现在使用宏观的局部变量的范围内。
+
+105. 更多宏的例子
+略

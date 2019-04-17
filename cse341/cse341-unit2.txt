@@ -1,0 +1,241 @@
+Unit 2 数据类型、模式匹配、尾递归等
+
+19. 编程语言的组成
+语法
+语义：如何计算值
+常见的使用方法
+现有的库
+工具
+
+20. 构造复杂数据类型
+各个语言中，3 个重要的类型构建模块——
+Each-of 类型：每个都有自己的类型，tuple
+One-of 类型：只有一个类型，int option
+Self-reference 类型：递归使用，int list
+
+21. Records: each-of 类型
+举例：
+    {bar = (1+2,true andalso true), foo = 3+4, baz = (false,9) }
+值：
+    {bar = (3,true), foo = 7, baz = (false,9)}
+类型：
+    {foo : int, bar : int*bool, baz : bool*int}
+顺序可变。
+取值：
+    #foo e
+
+22. Tuple 是语法糖
+tuple 和 record: 通过位置和通过名字
+Java 方法中的参数采用了混动的方式：函数定义时参数是通过名字，调用函数时参数是通过位置。
+ML: tuple 是一种 record。
+REPL 尽量在可以的情况下都使用 tuple。
+语法糖。
+
+23. 数据类型绑定：我们自己的 one-of 类型
+数据类型绑定是除了变量绑定和函数绑定外的第三种绑定。
+举例：
+datatype mytype = TwoInts of int * int
+                | Str of string
+                | Pizza
+在 datatype 中，多个构造元素(constructors)可以用来表示同一个数据类型下的数据。
+每个构造元素都是两种不同的东西：
+1）一个生成新 type 的构造函数(int * int -> mytype)，
+2）新 type 的值(Pizza 是一个值)。
+
+24. Case 表达式
+取 datatype 值的好方法：用到 case 表达式。
+示例：
+fun f x = (*f has type mytype -> int*)
+    case x of
+        Pizza => 3
+      | TwoInts(i1,i2) => i1 + i2
+      | Str s => String.size s
+case 分支中每个表达式（箭头后面的，每个分支都是 pattern => expression）的结果都要是同一种数据类型。
+这也是为什么它被称为 pattern-matching。
+每个分支相当于一个 let 表达式，变量是局部变量。
+
+25. Datatypes 的使用举例
+略
+
+26. Pattern Matching 总结
+datatype 的绑定：
+datatype t = C1 of t1 | C2 of t2 | ... | Cn of tn
+（省略的 of tn 表示不携带任何值。）
+取 t 的值：
+case e of p1 => e1 | p2 => e2 | ... | pn => en
+
+27. 另一个例子
+略
+
+28. 类型同义词
+类型同义词，可以创建现有类型的另一个名字，与现有的类型完全可以相互替换。
+type foo = int
+与此相比，之前介绍的数据类型绑定是创建一个新的数据类型。
+
+29. Lists 和 Options 都是数据类型（datatype)
+datatype 可以递归，所以我们可以通过它创造我们自己的 list 类型。
+举例：
+datatype my_int_list = Empty
+                     | Cons of int * my_int_list
+
+val one_two_three = Cons(1,Cons(2,Cons(3,Empty)))
+
+fun append_mylist (xs,ys) =
+    case xs of
+        Empty => ys
+      | Cons(x,xs’) => Cons(x, append_mylist(xs’,ys))
+
+SOME 和 NONE 也可以作为构造元素：
+fun inc_or_zero intoption =
+    case intoption of
+        NONE => 0
+      | SOME i => i+1
+其它构造元素：
+fun sum_list xs =
+    case xs of
+        [] => 0
+      | x::xs’ => x + sum_list xs’
+[]表示什么都没有，::传递了两个值。x 和 xs' 都是局部变量。
+
+30. 多态的 Datatypes
+举例：
+datatype ’a option = NONE | SOME of ’a
+
+datatype (’a,’b) tree = Node of ’a * (’a,’b) tree * (’a,’b) tree
+                      | Leaf of ’b
+
+普通数据类型和多态数据类型在使用构造元素、模式匹配上的用法一样。
+
+31. Each-of 数据类型的 Pattern Matching: 函数的奥义
+ML 中的函数都只接受一个参数，如果是多参数，是以 tuple 的格式传递的。
+在取 tuple 中每个值时，是使用了 pattern matching。
+没有参数的函数，传递的是一个 unit，unit 的值只有一种，就是()。
+预先定义好的，datatype unit = ()。
+
+32. 类型推断
+不用再写 #
+不用再写参数类型
+接收 'a 'b
+详细的之后叙述。
+
+33. 多态类型和相等类型
+具体的类型有时可以变得更普遍一些，如用到 'a 'b，但此时的 'a 'b 必须连续地被替换成同一种数据类型。
+''a 表示相等类型。
+fun same_thing(x,y) = if x=y then "yes" else "no" (* has type ’’a * ’’a -> string *)
+fun is_three x = if x=3 then "yes" else "no" (* has type int -> string *)
+
+34. 嵌套模式
+模式匹配的几个关键部分：
+1）变量模式 x 匹配数值 v，并且进行 x = v 的赋值。
+2）如果模式 C 是一个构造元素，并且不携带数据，则将模式 C 匹配 数值 C。
+3）模式 C 与pattern p 的匹配和与对应 v 值的绑定。
+4）pattern (p1,p2,...,pn) 与 数值 (v1,v2,...,vn) 如果一一匹配，则一一绑定。
+5）类似的，record 模式的绑定……
+基于此，可以利用嵌套——
+fun len xs =
+    case xs of
+       [] => 0
+     | x::xs’ => 1 + len xs’
+其中 x 没有用，并且百搭牌模式 _ 可以匹配任何东西，所以可以进行改进：
+fun len xs =
+    case xs of
+       [] => 0
+      | _::xs’ => 1 + len xs’
+百搭牌 _ 可以匹配任何值，但是不进行任何绑定。
+常数也可以作为 pattern，而且不进行绑定。
+
+35. 嵌套模式的举例
+略
+
+36. 精确地嵌套模式
+略
+
+37. 函数绑定中的多种情形
+one-of 类型是否可以在函数绑定中使用？
+ML 对此有特定的语法。
+datatype exp = Constant of int
+             | Negate of exp
+             | Add of exp * exp
+             | Multiply of exp * exp
+
+fun eval (Constant i) = i
+  | eval (Negate e2) = ~ (eval e2)
+  | eval (Add(e1,e2)) = (eval e1) + (eval e2)
+  | eval (Multiply(e1,e2)) = (eval e1) * (eval e2)
+
+fun append ([],ys) = ys
+  | append (x::xs’,ys) = x :: append(xs’,ys)
+
+其实是以下写法的语法糖：
+fun eval e =
+    case e of
+        Constant i => i
+      | Negate e2  => ~ (eval e2)
+      | Add(e1,e2) => (eval e1) + (eval e2)
+      | Multiply(e1,e2) => (eval e1) * (eval e2)
+fun append e =
+    case e of
+       ([],ys) => ys
+     | (x::xs’,ys) => x :: append(xs’,ys)
+
+38. 异常
+fun hd xs =
+    case xs of
+        []   => raise List.Empty
+      | x::_ => x
+通过异常绑定，可以建立自己的异常提示，也可以携带指定值。
+exception MyUndesirableCondition
+exception MyOtherException of int * int
+异常是函数，携带的值是 exn 数据类型。MyOtherException 的数据类型是 int*int->exn。
+接收异常：e1 handle p => e2
+
+39. 尾递归
+fun sum1 xs =
+    case xs of
+        [] => 0
+      | i::xs’ => i + sum1 xs’
+
+fun sum2 xs =
+    let fun f (xs,acc) =
+            case xs of
+                [] => acc
+              | i::xs’ => f(xs’,i+acc)
+    in
+        f(xs,0)
+    end
+因为有 call stack，sum2 虽然更复杂，但是也依然被倾向。
+在 sum1 中，每次递归都有一个 call stack。
+尾递归：除了返回被调用者的结果之外，调用者在被调用者返回之后没有其他事情可做。
+在 sum2 中，调用的是尾递归，ML 对尾递归有优化，
+调用者在调用前先弹出 stack，因此 sum2 的栈中最多只有一个排队的栈。
+（尾递归把返回结果放到了调用的参数里。调用者不必等到拿到了被调用者的返回值，才能计算它自己的返回结果。
+调用者就等于被调用者的返回值。因此调用者在调用被调用者前，可以先销毁自己放在栈上的东西。）
+
+40. 尾递归中的累加器
+使用累计器是将递归函数转化为尾递归函数的普遍方法。
+
+41. 尾递归的更多例子
+举例 1：
+fun fact1 n = if n=0 then 1 else n * fact1(n-1)
+
+fun fact2 n =
+    let fun aux(n,acc) = if n=0 then acc else aux(n-1,acc*n)
+    in
+        aux(n,1)
+    end
+举例 2：
+fun rev1 lst =
+   case lst of
+       [] => []
+     | x::xs => (rev1 xs) @ [x]
+
+ fun rev2 lst =
+     let fun aux(lst,acc) =
+             case lst of
+                 [] => acc
+               | x::xs => aux(xs, x::acc)
+     in
+         aux(lst,[])
+ end
+第二种方法是尾递归，并且 :: 不会在参数之间穿行。
+判断是否是尾递归的方法：略。
